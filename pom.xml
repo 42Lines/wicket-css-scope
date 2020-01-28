@@ -7,6 +7,8 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	
+	<name>42 Lines - Wicket Css Scoping</name>
+	<description>Processes wicket panel fragments and applies scope logic to encapsulate css</description>
 
 	<properties>
 		<java.version>11</java.version>
@@ -17,6 +19,19 @@
 		<antlr4.visitor>true</antlr4.visitor>
 		<antlr4.listener>true</antlr4.listener>
 	</properties>
+	
+		<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>42Lines Release Repository</name>
+			<url>https://repo.aws.42lines.net/repository/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>42Lines Snapshot Repository</name>
+			<url>https://repo.aws.42lines.net/repository/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 
 	<dependencies>

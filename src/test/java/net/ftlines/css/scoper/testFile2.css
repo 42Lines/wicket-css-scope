@@ -1,0 +1,66 @@
+.timer {
+    color: #996600;
+    font-size: smaller;
+}
+
+#preview .thumb:not(:empty) {
+	float:left;
+	width:70px;
+	margin-right:10px;
+}
+#preview .thumb:not(:empty) img {
+	max-width:100%;
+	height:auto;
+}
+#preview .thumb:not(:empty) + div {
+	float:left;
+	width:calc(100% - 80px);
+}
+
+@external
+.wicket-modal[aria-labelledby="Notification Preview"] 
+.w_content_container {
+	height:auto !important;
+}
+
+@container 
+#preview .thumb:not(:empty) + div {
+	float:right;
+	background: #FFF;
+	color: black;
+	width:calc(100% - 80px);
+}
+
+button.selected {
+	width:70px;
+}
+
+
+@external a.external {
+	width:70px;
+}
+
+.exception {
+	background-color: #FEECEA;
+	padding: 10px;
+}
+.data-table em {
+	font-style: normal;
+}
+.timer {
+    color: #996600;
+    font-size: smaller;
+}
+.report-table-wrapper {
+    display: inline-block;
+    position: relative;
+}
+
+#restCallErrorWrapper {
+	background-color: white;
+	width: 400px;
+	position: absolute;
+	top: 10px;
+	left: 100px;
+	z-index: 10;
+}

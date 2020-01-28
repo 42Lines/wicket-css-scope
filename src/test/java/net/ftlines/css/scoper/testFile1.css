@@ -1,0 +1,30 @@
+#notification-center th:nth-child(5),
+#notification-center td:nth-child(5),
+#notification-center div[class*="notification"] {
+	text-align:center;
+}
+#notification-center div[class*="notification"] {
+	display:inline-block;
+	width:14px;
+	height:14px;
+	position:relative;
+	margin:auto;
+}
+.notification-center .div[class*="enabled"]:before {
+	content:"\e628";
+	font-family:'icomoon';
+	display:block;
+	font-size: 115%;
+    width: 14px;
+    height: 14px;
+	font-weight: normal;
+    line-height: 18.5px;
+    color: #64c178;
+    text-align: center;
+    border-radius: 100%;
+    margin:auto;
+    position:absolute;
+}
+.wicket-modal[aria-labelledby*="Delete"] {
+	width:400px !important;
+}

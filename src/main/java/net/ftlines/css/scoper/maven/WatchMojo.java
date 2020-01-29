@@ -7,6 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 import net.ftlines.css.scoper.Watcher;
+import net.ftlines.css.scoper.WicketSourceFileModifier;
 
 /**
  * Watch for changes in inputPath, then compile scss files to outputPath using includePaths
@@ -18,7 +19,9 @@ public class WatchMojo extends AbstractCssScopeMojo {
 		Path outputRootPath = this.outputPath.toPath();
 		Path inputRootPath = this.inputPath.toPath();
 		try {
-			new Watcher(inputRootPath, outputRootPath).start();
+			new Watcher(inputRootPath, Watcher.isFileWatchableFunction(".html", ".css", ".js"), (file) -> {
+				new WicketSourceFileModifier(file, inputRootPath, outputRootPath).process();
+			} ) .start();
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getMessage(), e);
 		}

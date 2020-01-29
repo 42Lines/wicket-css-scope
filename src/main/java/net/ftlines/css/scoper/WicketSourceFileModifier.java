@@ -25,24 +25,10 @@ public class WicketSourceFileModifier {
 		this.inputRoot = inputRoot;
 		this.outputRoot = outputRoot;
 
-		if (Files.exists(outputRoot.resolve(filePath.getParent()).resolve(getPropertiesFileName()))) {
-			Path pth = outputRoot.resolve(filePath.getParent()).resolve(getPropertiesFileName());
-			SortedProperties p = new SortedProperties();
-			try {
-				p.load(Files.newInputStream(pth));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			metaData = new CssScopeMetadata(p);
-		} else {
-			metaData = new CssScopeMetadata(new SortedProperties());
-		}
-
 	}
 
 	public String getPropertiesFileName() {
 		int idx = filePath.getFileName().toString().toLowerCase().indexOf(".html");
-		;
 		return filePath.getFileName().toString().substring(0, idx) + ".compiled.properties";
 	}
 
@@ -59,6 +45,22 @@ public class WicketSourceFileModifier {
 	}
 
 	public CssScopeMetadata getMetaData() {
+		
+		if(metaData == null) {
+			if (Files.exists(outputRoot.resolve(filePath.getParent()).resolve(getPropertiesFileName()))) {
+				Path pth = outputRoot.resolve(filePath.getParent()).resolve(getPropertiesFileName());
+				SortedProperties p = new SortedProperties();
+				try {
+					p.load(Files.newInputStream(pth));
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+				metaData = new CssScopeMetadata(p);
+			} else {
+				metaData = new CssScopeMetadata(new SortedProperties());
+			}
+		}
+		
 		return metaData;
 	}
 
@@ -121,8 +123,9 @@ public class WicketSourceFileModifier {
 
 	public void save() throws Exception {
 		if (isDiry()) {
-			System.out.println("Writing " + getFileOutputPath());
+			System.out.println("Compiling " + getFileOutputPath());
 			getMetaData().setValue("source.hash", getSourceFileHash());
+			getFileOutputPath().getParent().toFile().mkdirs();
 			Files.write(getFileOutputPath(), getOutput().getBytes(), StandardOpenOption.WRITE,
 				StandardOpenOption.CREATE);
 			Files.write(getPropertiesOutputPath(), CssScopeMetadata.getMetaDataAsString(getMetaData()).getBytes(),
@@ -132,15 +135,20 @@ public class WicketSourceFileModifier {
 
 	public void process() {
 		try {
-			getFileOutputPath().getParent().toFile().mkdirs();
 			if (isWicketPanel() && isStyleDefiner()) {
 				save();
 			} else {
-				Files.copy(inputRoot.resolve(filePath), getFileOutputPath(), StandardCopyOption.REPLACE_EXISTING);
+				copy(filePath, inputRoot, outputRoot);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void copy(Path filePath, Path inputPath, Path outputPath) throws IOException {	
+		System.out.println("Syncing " + outputPath.resolve(filePath));
+		outputPath.resolve(filePath).getParent().toFile().mkdirs();
+		Files.copy(inputPath.resolve(filePath), outputPath.resolve(filePath), StandardCopyOption.REPLACE_EXISTING);
 	}
 
 }

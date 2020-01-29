@@ -6,7 +6,6 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -17,6 +16,8 @@ import java.util.Comparator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;;
@@ -24,12 +25,17 @@ import com.sun.nio.file.SensitivityWatchEventModifier;;
 public class Watcher implements Runnable {
 
 	private Path inputRootPath;
-	private Path outputRootPath;
+//	private Path outputRootPath;
 	private WatchService watchService;
+	
+	private Function<Path, Boolean> isWatchableFunction;
+	private Consumer<Path> processingFunction;
 
-	public Watcher(Path inputRoot, Path outputRoot) throws Exception {
+	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction) throws Exception {
 		inputRootPath = inputRoot;
-		outputRootPath = outputRoot;
+//		outputRootPath = outputRoot;
+		this.isWatchableFunction = isWatchableFunction;
+		this.processingFunction = processingFunction;
 	}
 
 	@Override
@@ -44,8 +50,8 @@ public class Watcher implements Runnable {
 
 	public void start() throws Exception {
 
-		Files.walk(inputRootPath, FileVisitOption.FOLLOW_LINKS).filter(this::parseableResource)
-			.map(inputRootPath::relativize).forEach(this::processPath);
+		Files.walk(inputRootPath, FileVisitOption.FOLLOW_LINKS).filter(p -> isWatchableFunction.apply(p))
+			.map(inputRootPath::relativize).forEach(processingFunction);
 		Thread.sleep(500);
 
 		watchService = FileSystems.getDefault().newWatchService();
@@ -60,29 +66,40 @@ public class Watcher implements Runnable {
 
 				Path p = inputRootPath.relativize(workingDirPath).normalize();
 
-				if (parseableResource(p)) {
-					processPath(p);
-				}
+				if (isWatchableFunction.apply(p)) {
+					processingFunction.accept(p);
+				} 
 			}
 			key.reset();
 		}
 	}
 
-	protected boolean parseableResource(Path path) {
-		return path.toString().toLowerCase().endsWith(".html");
-	}
+//	private static boolean parseableResource(Path path) {
+//		return path.toString().toLowerCase().endsWith(".html");
+//	}
+	
+//	protected boolean isSyncableResource(Path path) {
+//		return path.toString().toLowerCase().endsWith(".css") || path.toString().toLowerCase().endsWith(".scss");
+//	}
 
-	private void processPath(Path file) {
-		new WicketSourceFileModifier(file, inputRootPath, outputRootPath).process();
-	}
+//	protected void processPath(Path file) {
+//		new WicketSourceFileModifier(file, inputRootPath, outputRootPath).process();
+//	}
+	
+//	private void syncPath(Path file) {
+//		try {
+//			WicketSourceFileModifier.copy(file, inputRootPath, outputRootPath);
+//		} catch (IOException e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 
-	private static void registerRecursive(WatchService watchService, final Path root) throws IOException {
+	private void registerRecursive(WatchService watchService, final Path root) throws IOException {
 		// register all subfolders
 		Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-				// Only if contains .html files
-				if (pathContainsHtml(dir)) {
+				if (pathContainsWatchable(dir)) {
 					dir.register(watchService,
 						new WatchEvent.Kind[] { StandardWatchEventKinds.ENTRY_CREATE,
 							StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY },
@@ -98,10 +115,12 @@ public class Watcher implements Runnable {
 		});
 	}
 
-	private static boolean pathContainsHtml(Path dir) {
+
+	
+	private boolean pathContainsWatchable(Path dir) {
 		try (Stream<Path> stream = Files.walk(dir)) {
 			return stream.filter(file -> !Files.isDirectory(file))
-				.filter(file -> file.toString().toLowerCase().endsWith(".html")).findAny().isPresent();
+				.filter(p -> isWatchableFunction.apply(p)).findAny().isPresent();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -130,14 +149,28 @@ public class Watcher implements Runnable {
 
 	}
 
-	public static void startAsDaemon(Path inputRoot, Path outputRoot) throws Exception {
-		Thread watcher = new Thread(new Watcher(inputRoot, outputRoot));
+	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction) throws Exception {
+		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, processingFunction));
 		watcher.setDaemon(true);
 		watcher.start();
 	}
-
-	public static void main(String[] args) throws Exception {
-		new Watcher(Paths.get(args[0]), Paths.get(args[1])).start();
+	
+	public static void startAsDaemon(Path inputRoot, Path outputRoot) throws Exception {
+		startAsDaemon(inputRoot, isFileWatchableFunction(".html", ".css", ".scss"), (file) -> {
+			new WicketSourceFileModifier(file, inputRoot, outputRoot).process();
+		});
+	}
+	
+	public static Function<Path, Boolean> isFileWatchableFunction(String... extensions) {
+		return (p) -> {
+			for(String ext: extensions) {
+				if(p.toString().toLowerCase().endsWith(ext.toLowerCase())) {
+					return true;
+				}
+			}
+			return false;
+		};
 	}
 
+	
 }

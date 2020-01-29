@@ -20,7 +20,7 @@ public class WatchMojo extends AbstractCssScopeMojo {
 		Path inputRootPath = this.inputPath.toPath();
 		try {
 			new Watcher(inputRootPath, Watcher.isFileWatchableFunction(".html", ".css", ".js"), (file) -> {
-				new WicketSourceFileModifier(file, inputRootPath, outputRootPath).process();
+				new WicketSourceFileModifier(file, inputRootPath, outputRootPath).setDebugMode(true).process();
 			} ) .start();
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getMessage(), e);

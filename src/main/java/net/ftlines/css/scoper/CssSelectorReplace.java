@@ -27,13 +27,15 @@ public class CssSelectorReplace extends css3BaseListener {
 	private List<CssTransformationOperation> operationSequence = new ArrayList<>();
 	private int externalAnnotationRefCount = 0;
 	private boolean insideDeclaration = false;
-
 	public String scope;
 
-	public CssSelectorReplace(BufferedTokenStream tokenStream, CssScopeMetadata metadata) {
+	private boolean debugMode;
+
+	public CssSelectorReplace(BufferedTokenStream tokenStream, CssScopeMetadata metadata, boolean debugMode) {
 		this.rewriter = new TokenStreamRewriter(tokenStream);
 		this.metadata = metadata;
 		this.scope = metadata.getValue("scope", CssScopeMetadata::generateRandomString);
+		this.debugMode = debugMode;
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class CssSelectorReplace extends css3BaseListener {
 				op.originalSelector);
 			op.newSelector = "." + metadata.getValue(
 				"classnamecontext." + CssScopeMetadata.hashString(op.originalSelector) + ".computed_scope",
-				this::generateNewClassSelector);
+				() -> generateNewClassSelector(op.originalSelector));
 			operationSequence.add(op);
 			rewriter.replace(ctx.start, ctx.stop, op.newSelector);
 		}
@@ -98,7 +100,7 @@ public class CssSelectorReplace extends css3BaseListener {
 				op.originalSelector);
 			op.newSelector = "." + metadata.getValue(
 				"hashcontext." + CssScopeMetadata.hashString(op.originalSelector) + ".computed_scope",
-				this::generateNewClassSelector);
+				() -> generateNewClassSelector(op.originalSelector));
 			operationSequence.add(op);
 			rewriter.replace(ctx.start, ctx.stop, op.newSelector);
 		}
@@ -117,8 +119,12 @@ public class CssSelectorReplace extends css3BaseListener {
 		insideDeclaration = false;
 	}
 
-	private String generateNewClassSelector() {
-		return scope + "_" + CssScopeMetadata.generateRandomString();
+	private String generateNewClassSelector(String oldSelector) {
+		return scope + "_" + (debugMode ? sanitizeSelector(oldSelector) : CssScopeMetadata.generateRandomString());
+	}
+
+	private String sanitizeSelector(String oldSelector) {
+		return CssScopeMetadata.generateRandomString() + "_" + oldSelector.replaceAll("[^A-Za-z0-9]", "_");
 	}
 
 	@Override

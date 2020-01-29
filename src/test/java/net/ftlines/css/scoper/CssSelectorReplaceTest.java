@@ -1,13 +1,11 @@
 package net.ftlines.css.scoper;
 
 import static org.antlr.v4.runtime.CharStreams.fromString;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Properties;
 
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.CodePointCharStream;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +27,7 @@ class CssSelectorReplaceTest {
 		css3Lexer lexer = new css3Lexer(cs);
 		BufferedTokenStream stream = new BufferedTokenStream(lexer);
 		css3Parser par = new css3Parser(stream);
-		CssSelectorReplace replace = new CssSelectorReplace(stream, new CssScopeMetadata(new Properties()));
+		CssSelectorReplace replace = new CssSelectorReplace(stream, new CssScopeMetadata(new Properties()), false);
 		ParseTreeWalker.DEFAULT.walk(replace, par.stylesheet());
 		return replace.getOutput();
 	}

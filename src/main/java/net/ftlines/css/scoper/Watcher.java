@@ -25,7 +25,6 @@ import com.sun.nio.file.SensitivityWatchEventModifier;;
 public class Watcher implements Runnable {
 
 	private Path inputRootPath;
-//	private Path outputRootPath;
 	private WatchService watchService;
 	
 	private Function<Path, Boolean> isWatchableFunction;
@@ -33,7 +32,6 @@ public class Watcher implements Runnable {
 
 	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction) throws Exception {
 		inputRootPath = inputRoot;
-//		outputRootPath = outputRoot;
 		this.isWatchableFunction = isWatchableFunction;
 		this.processingFunction = processingFunction;
 	}
@@ -73,26 +71,6 @@ public class Watcher implements Runnable {
 			key.reset();
 		}
 	}
-
-//	private static boolean parseableResource(Path path) {
-//		return path.toString().toLowerCase().endsWith(".html");
-//	}
-	
-//	protected boolean isSyncableResource(Path path) {
-//		return path.toString().toLowerCase().endsWith(".css") || path.toString().toLowerCase().endsWith(".scss");
-//	}
-
-//	protected void processPath(Path file) {
-//		new WicketSourceFileModifier(file, inputRootPath, outputRootPath).process();
-//	}
-	
-//	private void syncPath(Path file) {
-//		try {
-//			WicketSourceFileModifier.copy(file, inputRootPath, outputRootPath);
-//		} catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
 
 	private void registerRecursive(WatchService watchService, final Path root) throws IOException {
 		// register all subfolders
@@ -156,8 +134,12 @@ public class Watcher implements Runnable {
 	}
 	
 	public static void startAsDaemon(Path inputRoot, Path outputRoot) throws Exception {
-		startAsDaemon(inputRoot, isFileWatchableFunction(".html", ".css", ".scss"), (file) -> {
-			new WicketSourceFileModifier(file, inputRoot, outputRoot).process();
+		startAsDaemon(inputRoot, outputRoot, ".html", ".css", ".scss");
+	}
+	
+	public static void startAsDaemon(Path inputRoot, Path outputRoot, String...extensions) throws Exception {
+		startAsDaemon(inputRoot, isFileWatchableFunction(extensions), (file) -> {
+			new WicketSourceFileModifier(file, inputRoot, outputRoot).setDebugMode(true).process();
 		});
 	}
 	

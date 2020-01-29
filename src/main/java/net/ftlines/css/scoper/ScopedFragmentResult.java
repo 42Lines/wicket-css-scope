@@ -47,13 +47,13 @@ public class ScopedFragmentResult {
 		return metadata;
 	}
 
-	public static ScopedFragmentResult transform(String css, String markup, CssScopeMetadata metadata) {
+	public static ScopedFragmentResult transform(String css, String markup, CssScopeMetadata metadata, boolean debugMode) {
 		CodePointCharStream cs = fromString(css);
 
 		css3Lexer lexer = new css3Lexer(cs);
 		BufferedTokenStream stream = new BufferedTokenStream(lexer);
 		css3Parser par = new css3Parser(stream);
-		CssSelectorReplace replace = new CssSelectorReplace(stream, metadata);
+		CssSelectorReplace replace = new CssSelectorReplace(stream, metadata, debugMode);
 		ParseTreeWalker.DEFAULT.walk(replace, par.stylesheet());
 
 		Document doc = Jsoup.parseBodyFragment(markup);

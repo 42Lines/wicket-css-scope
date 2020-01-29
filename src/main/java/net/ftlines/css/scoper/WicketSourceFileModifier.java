@@ -19,12 +19,18 @@ public class WicketSourceFileModifier {
 	private Path outputRoot;
 
 	private CssScopeMetadata metaData;
+	
+	private boolean debugMode = false;
 
 	public WicketSourceFileModifier(Path filePath, Path inputRoot, Path outputRoot) {
 		this.filePath = filePath;
 		this.inputRoot = inputRoot;
 		this.outputRoot = outputRoot;
-
+	}
+	
+	public WicketSourceFileModifier setDebugMode(boolean debugMode) {
+		this.debugMode = debugMode;
+		return this;
 	}
 
 	public String getPropertiesFileName() {
@@ -38,7 +44,7 @@ public class WicketSourceFileModifier {
 
 	public String getFileContents() {
 		try {
-			return Files.readAllLines(inputRoot.resolve(filePath)).stream().collect(Collectors.joining("\n"));
+			return pathAsString(inputRoot.resolve(filePath));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -103,7 +109,7 @@ public class WicketSourceFileModifier {
 	}
 
 	public String getOutput() {
-		ScopedFragmentResult r = ScopedFragmentResult.transform(getSourceStyle(), getSourceMarkup(), getMetaData());
+		ScopedFragmentResult r = ScopedFragmentResult.transform(getSourceStyle(), getSourceMarkup(), getMetaData(), debugMode);
 
 		Document doc = Jsoup.parseBodyFragment(getFileContents());
 		doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
@@ -145,10 +151,31 @@ public class WicketSourceFileModifier {
 		}
 	}
 	
-	public static void copy(Path filePath, Path inputPath, Path outputPath) throws IOException {	
-		System.out.println("Syncing " + outputPath.resolve(filePath));
-		outputPath.resolve(filePath).getParent().toFile().mkdirs();
-		Files.copy(inputPath.resolve(filePath), outputPath.resolve(filePath), StandardCopyOption.REPLACE_EXISTING);
+	public static void copy(Path filePath, Path inputPath, Path outputPath) throws IOException {
+		if(Files.exists(inputPath.resolve(filePath))) {
+			outputPath.resolve(filePath).getParent().toFile().mkdirs();
+			if(isChanged(inputPath.resolve(filePath), outputPath.resolve(filePath))) {
+				System.out.println("Syncing " + outputPath.resolve(filePath));
+				Files.copy(inputPath.resolve(filePath), outputPath.resolve(filePath), StandardCopyOption.REPLACE_EXISTING);
+			}
+		}
+	}
+	
+	private static boolean isChanged(Path sourceFile, Path targetFile) throws IOException {
+		final long size = Files.size(sourceFile);
+		
+		if(!Files.exists(targetFile))
+			return true;
+		
+	    if (size != Files.size(targetFile))
+	        return true;
+	    
+	    
+	    return !CssScopeMetadata.hashString(pathAsString(sourceFile)).equalsIgnoreCase(CssScopeMetadata.hashString(pathAsString(targetFile)));
+	}
+	
+	private static String pathAsString(Path file) throws IOException {
+		return Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
 	}
 
 }

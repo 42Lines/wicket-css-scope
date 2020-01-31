@@ -1,0 +1,61 @@
+<html>
+<wicket:scss>
+
+@import "_colors.scss";
+
+$convo-radius:10px;
+$my-color:#9249da;
+
+
+/* I can't think of a reason you would ever do this, but the @external 
+	annotation will emit the rule into the global scope as if there was no css compile process */
+@external .globalRule {
+	
+}
+
+/* the @container annotation will prefix the rule with the container scope designation, but not mangle the rule names.
+  This is would be used if you need to build the style rules for a panel and some known set of subpanels (think components from base-webapp)
+  scopes could still be applied and 
+  */
+@container span {
+	background-color: green;
+}
+
+/* This is a normal rule and it will get scoped to just this panel */
+.mySpan {
+	font-weight: bold;
+	background-color: yellow;
+}
+
+/* This is an id selector rule, and these are bad to write in panels 
+	because you can't guarantee the uniqueness if the panel is included multiple times
+	however, should you _need_ to write these, the compiler will attempt to re-write the rule as a scoped class selector */
+#idsAreBad {
+	color: blue;
+}
+</wicket:scss>
+
+<wicket:head>
+	<style>
+		/* This is a normal rule and it will get scoped to just this panel */	
+		.origRule {
+			font-size: 40px;
+			background-color: red;
+		}
+
+	</style>
+	<script>
+		$( document ).ready(function() {
+			$('.x-formatter-locator').text( $('.x-dev-locator').html() );
+		});
+	</script>
+</wicket:head>
+<wicket:panel>
+	<div class="x-dev-locator">
+		<div id="idsAreBad" class="chat origRule mySpan globalStyleRule x-dev-property">This is a <span>body</span> span</div>
+	</div>
+	
+	Rewritten As:
+	<pre class="x-formatter-locator"></pre>
+</wicket:panel>
+</html>

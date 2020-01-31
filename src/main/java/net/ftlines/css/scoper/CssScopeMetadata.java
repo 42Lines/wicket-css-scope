@@ -31,10 +31,6 @@ public class CssScopeMetadata {
 		properties.setProperty(key, value);
 	}
 
-	// public Map<String, String> getStorageAsProperties() {
-	// new Properties();
-	// }
-
 	public static String generateRandomString() {
 		int leftLimit = 97; // letter 'a'
 		int rightLimit = 122; // letter 'z'

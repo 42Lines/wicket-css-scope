@@ -1,13 +1,17 @@
 package net.ftlines.css.scoper.maven;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import net.ftlines.css.scoper.WicketSourceFileModifier;
+import io.bit3.jsass.importer.Importer;
+import net.ftlines.css.scoper.AbstractScssFragmentContributor.FilePathScssImportResolver;
+import net.ftlines.css.scoper.wicket.WicketSourceFileModifier;
 
 /**
  * Compilation of all html files from inputpath to outputpath using includePaths
@@ -22,7 +26,20 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 
 		try {
 			for (String f : fileSetManager.getIncludedFiles(fileset)) {
-				new WicketSourceFileModifier(Path.of(f), inputRootPath, outputRootPath).process();
+				new WicketSourceFileModifier(Path.of(f), inputRootPath, outputRootPath) {
+					
+					@Override
+					protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
+						Collection<Importer> list = super.getAllScssImporters();
+						if(scssImportRoot != null) {
+							for(File root: scssImportRoot) {
+								list.add(new FilePathScssImportResolver(root.toPath()));
+							}
+						}
+						return list;
+					}
+					
+				}.process();
 			}
 
 		} catch (Exception e) {

@@ -26,11 +26,12 @@ public class Watcher implements Runnable {
 
 	private Path inputRootPath;
 	private WatchService watchService;
-	
+
 	private Function<Path, Boolean> isWatchableFunction;
 	private Consumer<Path> processingFunction;
 
-	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction) throws Exception {
+	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction)
+		throws Exception {
 		inputRootPath = inputRoot;
 		this.isWatchableFunction = isWatchableFunction;
 		this.processingFunction = processingFunction;
@@ -66,7 +67,7 @@ public class Watcher implements Runnable {
 
 				if (isWatchableFunction.apply(p)) {
 					processingFunction.accept(p);
-				} 
+				}
 			}
 			key.reset();
 		}
@@ -93,12 +94,10 @@ public class Watcher implements Runnable {
 		});
 	}
 
-
-	
 	private boolean pathContainsWatchable(Path dir) {
 		try (Stream<Path> stream = Files.walk(dir)) {
-			return stream.filter(file -> !Files.isDirectory(file))
-				.filter(p -> isWatchableFunction.apply(p)).findAny().isPresent();
+			return stream.filter(file -> !Files.isDirectory(file)).filter(p -> isWatchableFunction.apply(p)).findAny()
+				.isPresent();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -127,26 +126,33 @@ public class Watcher implements Runnable {
 
 	}
 
-	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction) throws Exception {
+	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction,
+		Consumer<Path> processingFunction) throws Exception {
 		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, processingFunction));
 		watcher.setDaemon(true);
 		watcher.start();
 	}
-	
-	public static void startAsDaemon(Path inputRoot, Path outputRoot) throws Exception {
-		startAsDaemon(inputRoot, outputRoot, ".html", ".css", ".scss");
-	}
-	
-	public static void startAsDaemon(Path inputRoot, Path outputRoot, String...extensions) throws Exception {
-		startAsDaemon(inputRoot, isFileWatchableFunction(extensions), (file) -> {
-			new WicketSourceFileModifier(file, inputRoot, outputRoot).setDebugMode(true).process();
-		});
-	}
-	
+
+//	public static void startAsDaemon(Path inputRoot, Path outputRoot) throws Exception {
+//		startAsDaemon(inputRoot, outputRoot, ".html", ".css", ".scss");
+//	}
+//
+//	public static void startAsDaemon(Path inputRoot, Path outputRoot, String... extensions) throws Exception {
+//		startAsDaemon(inputRoot, isFileWatchableFunction(extensions), (file) -> {
+//			new WicketSourceFileModifier(file, inputRoot, outputRoot) {
+//				@Override
+//				protected void configureOptions(Options options) {
+//					super.configureOptions(options);
+//					options.getImporters().add(new FilePathScssImportResolver(Path.of(".")));
+//				}
+//			}.setDebugMode(true).process();
+//		});
+//	}
+
 	public static Function<Path, Boolean> isFileWatchableFunction(String... extensions) {
 		return (p) -> {
-			for(String ext: extensions) {
-				if(p.toString().toLowerCase().endsWith(ext.toLowerCase())) {
+			for (String ext : extensions) {
+				if (p.toString().toLowerCase().endsWith(ext.toLowerCase())) {
 					return true;
 				}
 			}
@@ -154,5 +160,4 @@ public class Watcher implements Runnable {
 		};
 	}
 
-	
 }

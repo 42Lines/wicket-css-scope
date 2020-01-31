@@ -743,11 +743,13 @@ Charset
     ;
     
 external
-    : '@external' ws
+    : '@external;' ws
+    | '@external' ws
     ;  
     
 containerScope
-    : '@container' ws
+    : '@container;' ws
+    | '@container' ws
     ;     
 
 Important

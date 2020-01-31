@@ -27,6 +27,16 @@ public class ScopedFragmentResult {
 	private ScopedFragmentResult() {
 	}
 
+	public ScopedFragmentResult(String oldCss, String oldHtml, String newCss, String newHtml,
+		CssScopeMetadata metadata) {
+		super();
+		this.oldCss = oldCss;
+		this.oldHtml = oldHtml;
+		this.newCss = newCss;
+		this.newHtml = newHtml;
+		this.metadata = metadata;
+	}
+
 	public String getScopedCss() {
 		return newCss;
 	}
@@ -47,7 +57,8 @@ public class ScopedFragmentResult {
 		return metadata;
 	}
 
-	public static ScopedFragmentResult transform(String css, String markup, CssScopeMetadata metadata, boolean debugMode) {
+	public static ScopedFragmentResult transform(String css, String markup, CssScopeMetadata metadata,
+		boolean debugMode) {
 		CodePointCharStream cs = fromString(css);
 
 		css3Lexer lexer = new css3Lexer(cs);
@@ -77,16 +88,12 @@ public class ScopedFragmentResult {
 			}
 		}
 
-		ScopedFragmentResult r = new ScopedFragmentResult();
-		r.metadata = metadata;
+		return new ScopedFragmentResult(css, markup, replace.getOutput(), doc.body().html().toString(), metadata);
+	}
 
-		r.oldCss = css;
-		r.oldHtml = markup;
-
-		r.newCss = replace.getOutput();
-		r.newHtml = doc.body().html().toString();
-
-		return r;
+	@Override
+	public String toString() {
+		return "ScopedFragmentResult [newCss=" + newCss + ", newHtml=" + newHtml + "]";
 	}
 
 }

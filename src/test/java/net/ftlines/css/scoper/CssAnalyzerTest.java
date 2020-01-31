@@ -1,14 +1,8 @@
 package net.ftlines.css.scoper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
-import org.junit.jupiter.api.Test;
-
-class CssAnalyzerTest {
+class CssAnalyzerTest { 
 //
 //	@Test
 //	void testSimpleSelector() {

@@ -1,0 +1,234 @@
+//page widths
+$page-width:960px;
+$max-page-width:1440px;
+$small-iframe:837px; //small iframe in canvas is 838px
+$large-iframe:1126px;
+
+//spacing
+$page-margins:30px;
+$standard-margin:10px;
+$double-margin:#{$standard-margin * 2};
+$mini-margin:7px;
+$micro-margin:3px;
+
+//font sizes and faces
+$font-stack:'Open Sans', sans-serif;
+$serif-stack:Garamond, Times New Roman, serif;
+$san-serif-stack:'Open Sans', sans-serif;
+
+$default-line-height:1.35em;
+$p-line-height:1.5em;
+
+$default-font-size:1.4rem; //14px or 140% of html 10px base
+$default-mobile-font:1.2rem;
+$small-font:1.2rem;
+$micro-font:1.1rem;
+$modal-title-size:2.2rem;
+$gen-header-size:2.5rem; 
+
+$h1-size:2.4rem; //standalone
+$h1-dt:2.2rem; //iframe
+$h1-mobile:1.8rem; //mobile
+
+$h2-size:1.8rem; //standalone & iframe
+$h2-mobile:1.6rem; //mobile
+
+$h3-size:1.6rem; //standalone & iframe
+$h3-mobile:1.4rem; //mobile
+
+$semibold:600;
+
+//text colors
+$text-color:#3a3a3a; //dark gray
+$dark-font:#1a1a1a;
+$med-font:#666;
+$light-font:#999;
+$lightest-font:#fff;
+$inactive-text:#aaabaa; //light gray
+$dark-box-med-text:#888;
+
+//links
+$link-color:#0073a8; //dark blue
+$focus-color:#8abad4; //light blue
+$light-link:#4db9ef; //light blue
+$inactive-link:#afbcd4; //light blue
+
+//box colors
+$base-bg:#fff; //white
+$light-bg:#eff2f7; //light blue
+$light-box-highlight:darken($light-bg, 10%);
+$light-box-highlight-mid:darken($light-bg, 5%);
+
+$dark-box-bg:#34444f;
+$darkish-box-bg:lighten($dark-box-bg, 7%);
+$darker-box-bg:darken($dark-box-bg, 5%);
+$darkest-box-bg:darken($dark-box-bg, 10%);
+
+$med-box-bg:#e0e0e0; //gray
+$box-bg:#fafbfc; //light gray
+$highlight-box:#f1f2f2; //light gray
+
+//borders
+$default-border-color:#d6dadc; //light gray
+$dark-box-border:$darkest-box-bg;
+$dark-tab-bg:#352F2C;
+$thin-border:1px;
+$med-border:2px;
+$thick-border:4px;
+$style-dotted:dotted;
+$style-solid:solid;
+$border-highlight:#fc9e00;
+
+$solid-border:1px solid $default-border-color;
+$light-border:1px solid $light-box-highlight;
+$dark-border:1px solid #999;
+$darkest-border:1px solid #000;
+$dotted-border:1px dotted #999;
+$neg-dotted-border:1px dotted #888;
+$delim-color:$default-border-color;
+
+//buttons
+$button-color:$link-color;
+$button-hover:#005075;
+$light-button:#dee4ed;
+$input-focus:0 0 1px 2px $focus-color;
+$radio-focus:0 0 0 2px $focus-color;
+
+//highlight, error, icon colors
+$accent-color:#f15a24; //orange for flag
+$checkmark-color:#64c178; //medium green
+$badge:#fdcb30; //yellow
+$highlight-box-bg:#42525D;
+$toggle-bg:#ccc; //light gray
+$money-bg:#deedc4; //light green
+$stripe-color:#f4f3e8; //beige
+$row-highlight:#fffcd2; //light yellow
+$new-color:#7dbd34;
+
+//errors & warnings
+$error-font-color:#b20; //dark red
+$error-bg:#fcede8; //light red
+$error-border:#f09990;
+$warning-text:#0C2955; //dark blue
+$warning-bg:#eef0f5; //light blue
+$warning-border:#9badc8;
+$success-text:#325301; //dark green
+$success-bg:#ecf4dc; //light green;
+$success-border:#96c761;
+$info-text:#A33D04; //dark yellow
+$info-bg:#fffacf; //light yellow
+$info-border:#fc0;
+
+//shadows, radius, & opacity
+$transition-time:.3s;
+$default-box-shadow:rgba(0,0,0,.4);
+$box-shadow:1px 1px 5px 0 $default-box-shadow;
+$default-opacity:rgba(0,0,0,.7);
+$default-border-radius:5px; //inputs and errors
+$button-radius:30px;
+$box-radius:2px;
+
+//icon sizes
+$icon-font:"icomoon", sans-serif;
+$solo-icon-size:18px;
+$solo-icon-xs:12px;
+$solo-icon-small:14px;
+$solo-icon-medium:16px;
+$solo-icon-large:20px;
+$solo-icon-xl:24px;
+
+//discussion spacing
+$comment-indent:0 150px $standard-margin 30px;
+$mobile-comment-indent:0 $double-margin $standard-margin $double-margin;
+$label-width:120px;
+$wide-label:160px;
+
+//annotation pins
+$pin-red:#d92528;
+$pin-blue:#41a6f2;
+$pin-yellow:#f99f1e;
+$pin-green:#79c944;
+$pin-purple:#632e92;
+$pin-white:#fff;
+
+//Responsive Breakpoints
+$xs: "only screen and (max-width: 420px)"; 
+$sm: "only screen and (max-width: 849px)"; //harmonize iframe width on desktop (iphone X landscape = 838px in assignments)
+$md: "only screen and (max-width: 960px)";
+$lg: "only screen and (max-width: 1024px)";
+$landscape: "only screen and (orientation: landscape)";
+$portrait: "only screen and (orientation: portrait)";
+$iframe-sm: "only screen and (max-width: " $small-iframe ")";
+
+//vendor mixins
+//gradients
+@mixin linearGradient($top, $start, $bottom, $end) {
+	background: $bottom;
+	background: linear-gradient(to bottom, $top $start,$bottom $end);
+}
+//box shadows
+@mixin boxShadow($top, $left, $blur, $color, $inset:"") {
+    box-shadow:$top $left $blur $color #{$inset};
+}
+//transforms
+@mixin genTransform($change) {
+	transform:$change;
+}
+@mixin genTransition($change) {
+	transition:$change;
+}
+
+//pointers
+$pointer-default-width:15px;
+@mixin pointer($direction, $color, $width) {
+@if not index(top right bottom left, $direction) {
+    @error "Direction must be either `top`, `right`, `bottom` or `left`.";
+  }
+	content: '';
+	width: 0;
+	height: 0;
+	position:absolute;
+	z-index: 2;
+	visibility:visible;
+
+	$perpendicular-borders: $width solid transparent;
+	@if $direction == top {
+	border-bottom:$width solid $color;
+	}
+	@if $direction == bottom {
+	border-top:$width solid $color;
+	}
+	@if $direction == left {
+	border-right:$width solid $color;
+	}
+	@if $direction == right {
+	border-left:$width solid $color;
+	}
+
+	@if $direction == top or $direction == bottom {
+	border-left:   $perpendicular-borders;
+	border-right:  $perpendicular-borders;
+	} @else if $direction == right or $direction == left {
+	border-bottom: $perpendicular-borders;
+	border-top:    $perpendicular-borders;
+	}
+}
+
+@mixin hideText() {
+	color:transparent;
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+
+	&:hover {text-decoration:none;}
+}
+@mixin unHideText() {
+	color:inherit;
+	clip:initial;
+	position:initial !important;
+	height:initial;
+	width:initial;
+	overflow:initial;
+}

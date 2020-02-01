@@ -91,4 +91,71 @@ Becomes
 .abcde .containerCssRule {}
 ```
 
+## Maven
 
+Basic Setup:
+```xml
+<plugin>
+        <groupId>net.ftlines</groupId>
+				<artifactId>wicket-css-scope</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				
+				<executions>
+					<execution>
+						<id>compile-markup</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>compile-markup</goal>
+						</goals>
+					</execution>
+				</executions>
+				
+   		<configuration>
+         		<inputPath>${basedir}/src/main/java/</inputPath>
+         		<fileset>
+     				<directory>${basedir}/src/main/java</directory>
+     				<includes>
+           				<include>**/*.html</include>
+       			</includes>
+     			</fileset>
+     			<scssImportRoot>
+      				<param>${basedir}/src/main/webapp/css/sass</param>
+    			</scssImportRoot>
+  		</configuration>
+ 
+</plugin>
+```
+
+Goals:
+* compile-markup
+* watch
+
+## Programatic Watcher
+
+Install this into a local dev server to recompile changes to a live classpath as the files are modified.
+
+```java
+
+import net.ftlines.css.scoper.AbstractScssFragmentContributor.FilePathScssImportResolver;
+import net.ftlines.css.scoper.Watcher;
+import net.ftlines.css.scoper.wicket.WicketSourceFileModifier;
+import io.bit3.jsass.importer.Importer;
+
+Path inputRoot = Path.of(System.getProperty("CssCompilerSourceDir", "src/main/java"));
+Path outputRoot = Path.of(System.getProperty("CssCompilerTargetDir", "target/classes"));
+Path scssImportRoot = Path.of(System.getProperty("ScssImportRootDir", "src/main/webapp/css/sass"));
+      
+Watcher.startAsDaemon(inputRoot, Watcher.isFileWatchableFunction(".html", ".css"), (file) -> {
+		new WicketSourceFileModifier(file, inputRoot,	outputRoot) {
+
+			@Override
+			protected java.util.Collection<Importer> getAllScssImporters() {
+				Collection<Importer> list = super.getAllScssImporters();
+				list.add(new FilePathScssImportResolver(scssImportRoot));
+				return list;
+			}
+
+		}.setDebugMode(true).process();
+	});
+
+```

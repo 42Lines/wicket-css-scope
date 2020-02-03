@@ -1,18 +1,8 @@
 package net.ftlines.css.scoper;
 
-import static org.antlr.v4.runtime.CharStreams.fromString;
-
-import org.antlr.v4.runtime.BufferedTokenStream;
-import org.antlr.v4.runtime.CodePointCharStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
-import antlr.css3.css3Lexer;
-import antlr.css3.css3Parser;
-import net.ftlines.css.scoper.CssSelectorReplace.CssTransformationOperation;
-import net.ftlines.css.scoper.CssSelectorReplace.CssTransformationOperationType;
 
 public class ScopedFragmentResult {
 
@@ -59,13 +49,8 @@ public class ScopedFragmentResult {
 
 	public static ScopedFragmentResult transform(String css, String markup, CssScopeMetadata metadata,
 		boolean debugMode) {
-		CodePointCharStream cs = fromString(css);
 
-		css3Lexer lexer = new css3Lexer(cs);
-		BufferedTokenStream stream = new BufferedTokenStream(lexer);
-		css3Parser par = new css3Parser(stream);
-		CssSelectorReplace replace = new CssSelectorReplace(stream, metadata, debugMode);
-		ParseTreeWalker.DEFAULT.walk(replace, par.stylesheet());
+		CssSelectorReplace replace = CssSelectorReplace.parse(css, metadata, debugMode);
 
 		Document doc = Jsoup.parseBodyFragment(markup);
 		doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
@@ -95,5 +80,77 @@ public class ScopedFragmentResult {
 	public String toString() {
 		return "ScopedFragmentResult [newCss=" + newCss + ", newHtml=" + newHtml + "]";
 	}
+	
+	public enum CssTransformationOperationType {
+		CLASS_REPLACEMENT, ID_TO_CLASS, OUTERSCOPE_ASSIGNMENT
+	}
+
+	public static class CssTransformationOperation {
+		private CssTransformationOperationType operation;
+		private String originalSelector;
+		private String newSelector;
+
+		public CssTransformationOperation(CssTransformationOperationType operation, String originalSelector,
+			String newSelector) {
+			super();
+			this.operation = operation;
+			this.originalSelector = originalSelector;
+			this.newSelector = newSelector;
+		}
+
+		public CssTransformationOperationType getOperation() {
+			return operation;
+		}
+
+		public String getOriginalSelector() {
+			return originalSelector;
+		}
+
+		public String getNewSelector() {
+			return newSelector;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((newSelector == null) ? 0 : newSelector.hashCode());
+			result = prime * result + ((operation == null) ? 0 : operation.hashCode());
+			result = prime * result + ((originalSelector == null) ? 0 : originalSelector.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			CssTransformationOperation other = (CssTransformationOperation) obj;
+			if (newSelector == null) {
+				if (other.newSelector != null)
+					return false;
+			} else if (!newSelector.equals(other.newSelector))
+				return false;
+			if (operation != other.operation)
+				return false;
+			if (originalSelector == null) {
+				if (other.originalSelector != null)
+					return false;
+			} else if (!originalSelector.equals(other.originalSelector))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "CssTransformationOperation [operation=" + operation + ", originalSelector=" + originalSelector
+				+ ", newSelector=" + newSelector + "]";
+		}
+
+	}
+
 
 }

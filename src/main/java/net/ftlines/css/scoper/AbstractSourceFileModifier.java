@@ -179,7 +179,7 @@ public abstract class AbstractSourceFileModifier {
 			.equalsIgnoreCase(CssScopeMetadata.hashString(pathAsString(targetFile)));
 	}
 
-	private static String pathAsString(Path file) throws IOException {
+	public static String pathAsString(Path file) throws IOException {
 		return Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
 	}
 

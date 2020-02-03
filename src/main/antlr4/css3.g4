@@ -196,7 +196,7 @@ term
     | ident ws               # knownTerm
     | var                    # knownTerm
     | Uri ws                 # knownTerm
-    | Hexcolor               # knownTerm
+    | hash               	 # knownTerm
     | calc                   # knownTerm
     | function               # knownTerm
     | unknownDimension ws    # unknownTerm
@@ -209,10 +209,6 @@ function
 
 dxImageTransform
     : DxImageTransform ws expr ')' ws    // IE DXImageTransform function
-    ;
-
-Hexcolor
-    : '#' Hex Hex? Hex? Hex? Hex? Hex?
     ;
 
 number

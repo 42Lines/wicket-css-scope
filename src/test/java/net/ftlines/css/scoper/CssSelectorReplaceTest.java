@@ -112,7 +112,7 @@ class CssSelectorReplaceTest {
 			replace("@container #class-grades .form-list label, #class-grades .form-list .label {	width:120px; }", p));
 		
 		
-		assertEquals(".lmnop { background-color: #FFF;}", replace(".wicket-upload .progressbar .progress {height:10px;	background: #214984;	}", p));
+		assertEquals(".abcde .wicket-upload .progressbar .progress {height:10px;	background: #214984; }", replace("@container .wicket-upload .progressbar .progress {height:10px;	background: #214984; }", p));
 		
 		
 	}

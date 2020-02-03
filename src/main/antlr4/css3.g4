@@ -197,6 +197,7 @@ term
     | var                    # knownTerm
     | Uri ws                 # knownTerm
     | hash               	 # knownTerm
+    | hashColor				 # knownTerm
     | calc                   # knownTerm
     | function               # knownTerm
     | unknownDimension ws    # unknownTerm
@@ -713,6 +714,10 @@ DashMatch
 hash
     : '#' ident
     ;
+    
+hashColor
+    : '#' Nmchar*
+    ;    
 
 Import
     : '@' I M P O R T

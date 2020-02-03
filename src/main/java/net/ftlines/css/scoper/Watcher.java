@@ -133,22 +133,6 @@ public class Watcher implements Runnable {
 		watcher.start();
 	}
 
-//	public static void startAsDaemon(Path inputRoot, Path outputRoot) throws Exception {
-//		startAsDaemon(inputRoot, outputRoot, ".html", ".css", ".scss");
-//	}
-//
-//	public static void startAsDaemon(Path inputRoot, Path outputRoot, String... extensions) throws Exception {
-//		startAsDaemon(inputRoot, isFileWatchableFunction(extensions), (file) -> {
-//			new WicketSourceFileModifier(file, inputRoot, outputRoot) {
-//				@Override
-//				protected void configureOptions(Options options) {
-//					super.configureOptions(options);
-//					options.getImporters().add(new FilePathScssImportResolver(Path.of(".")));
-//				}
-//			}.setDebugMode(true).process();
-//		});
-//	}
-
 	public static Function<Path, Boolean> isFileWatchableFunction(String... extensions) {
 		return (p) -> {
 			for (String ext : extensions) {

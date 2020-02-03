@@ -6,6 +6,7 @@
 $convo-radius:10px;
 $my-color:#9249da;
 
+.scssRule {}
 
 /* I can't think of a reason you would ever do this, but the @external 
 	annotation will emit the rule into the global scope as if there was no css compile process */
@@ -38,7 +39,7 @@ $my-color:#9249da;
 <wicket:head>
 	<style>
 		/* This is a normal rule and it will get scoped to just this panel */	
-		.origRule {
+		.nonScssRule {
 			font-size: 40px;
 			background-color: red;
 		}
@@ -52,7 +53,7 @@ $my-color:#9249da;
 </wicket:head>
 <wicket:panel>
 	<div class="x-dev-locator">
-		<div id="idsAreBad" class="chat origRule mySpan globalStyleRule x-dev-property">This is a <span>body</span> span</div>
+		<div id="idsAreBad" class="scssRule nonScssRule mySpan globalStyleRule x-dev-property">This is a <span>body</span> span</div>
 	</div>
 	
 	Rewritten As:

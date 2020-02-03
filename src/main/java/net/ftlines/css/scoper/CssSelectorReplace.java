@@ -21,6 +21,16 @@ import antlr.css3.css3Parser.TypeSelectorContext;
 
 public class CssSelectorReplace extends css3BaseListener {
 
+	public static final String SCOPE_PROPERTY = "scope";
+
+	public static final String CLASS_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT = "classnamecontext.%s.computed_scope";
+	public static final String CLASS_CONTEXT_OPERATION_PROPERTY_FORMAT = "classnamecontext.%s.operation";
+	public static final String CLASS_CONTEXT_ORIG_PROPERTY_FORMAT = "classnamecontext.%s.original";
+
+	public static final String HASH_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT = "hashcontext.%s.computed_scope";
+	public static final String HASH_CONTEXT_OPERATION_PROPERTY_FORMAT = "hashcontext.%s.operation";
+	public static final String HASH_CONTEXT_ORIG_PROPERTY_FORMAT = "hashcontext.%s.original";
+
 	private CssScopeMetadata metadata;
 
 	private TokenStreamRewriter rewriter;
@@ -34,7 +44,7 @@ public class CssSelectorReplace extends css3BaseListener {
 	public CssSelectorReplace(BufferedTokenStream tokenStream, CssScopeMetadata metadata, boolean debugMode) {
 		this.rewriter = new TokenStreamRewriter(tokenStream);
 		this.metadata = metadata;
-		this.scope = metadata.getValue("scope", CssScopeMetadata::generateRandomString);
+		this.scope = metadata.getValue(SCOPE_PROPERTY, CssScopeMetadata::generateRandomString);
 		this.debugMode = debugMode;
 	}
 
@@ -75,16 +85,18 @@ public class CssSelectorReplace extends css3BaseListener {
 			CssTransformationOperation op = new CssTransformationOperation();
 			op.operation = CssTransformationOperationType.CLASS_REPLACEMENT;
 			op.originalSelector = ctx.getText();
-			metadata.setValue("classnamecontext." + CssScopeMetadata.hashString(op.originalSelector) + ".operation",
+			metadata.setValue(getPropertyKey(CLASS_CONTEXT_OPERATION_PROPERTY_FORMAT, op.originalSelector),
 				op.operation.name());
-			metadata.setValue("classnamecontext." + CssScopeMetadata.hashString(op.originalSelector) + ".original",
+			metadata.setValue(getPropertyKey(CLASS_CONTEXT_ORIG_PROPERTY_FORMAT, op.originalSelector),
 				op.originalSelector);
-			op.newSelector = "." + metadata.getValue(
-				"classnamecontext." + CssScopeMetadata.hashString(op.originalSelector) + ".computed_scope",
-				() -> generateNewClassSelector(op.originalSelector));
+
+			op.newSelector = "."
+				+ metadata.getValue(getPropertyKey(CLASS_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT, op.originalSelector),
+					() -> generateNewClassSelector(op.originalSelector));
 			operationSequence.add(op);
 			rewriter.replace(ctx.start, ctx.stop, op.newSelector);
 		}
+
 	}
 
 	@Override
@@ -94,13 +106,13 @@ public class CssSelectorReplace extends css3BaseListener {
 			CssTransformationOperation op = new CssTransformationOperation();
 			op.operation = CssTransformationOperationType.ID_TO_CLASS;
 			op.originalSelector = ctx.getText();
-			metadata.setValue("hashcontext." + CssScopeMetadata.hashString(op.originalSelector) + ".operation",
+			metadata.setValue(getPropertyKey(HASH_CONTEXT_OPERATION_PROPERTY_FORMAT, op.originalSelector),
 				op.operation.name());
-			metadata.setValue("hashcontext." + CssScopeMetadata.hashString(op.originalSelector) + ".original",
+			metadata.setValue(getPropertyKey(HASH_CONTEXT_ORIG_PROPERTY_FORMAT, op.originalSelector),
 				op.originalSelector);
-			op.newSelector = "." + metadata.getValue(
-				"hashcontext." + CssScopeMetadata.hashString(op.originalSelector) + ".computed_scope",
-				() -> generateNewClassSelector(op.originalSelector));
+			op.newSelector = "."
+				+ metadata.getValue(getPropertyKey(HASH_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT, op.originalSelector),
+					() -> generateNewClassSelector(op.originalSelector));
 			operationSequence.add(op);
 			rewriter.replace(ctx.start, ctx.stop, op.newSelector);
 		}
@@ -240,6 +252,10 @@ public class CssSelectorReplace extends css3BaseListener {
 				+ ", newSelector=" + newSelector + "]";
 		}
 
+	}
+
+	public static String getPropertyKey(String format, String selector) {
+		return String.format(format, CssScopeMetadata.hashString(selector));
 	}
 
 }

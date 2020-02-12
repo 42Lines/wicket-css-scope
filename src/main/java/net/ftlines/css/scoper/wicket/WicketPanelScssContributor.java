@@ -16,8 +16,6 @@ public class WicketPanelScssContributor extends AbstractScssFragmentContributor 
 
 	@Override
 	public Optional<String> getScss() {
-		if (!input.toLowerCase().contains("wicket:head"))
-			return Optional.empty();
 
 		if (!input.toLowerCase().contains("scss"))
 			return Optional.empty();

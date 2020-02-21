@@ -119,9 +119,9 @@ public abstract class AbstractSourceFileModifier {
 			getMetaData().setValue("source.hash", getSourceFileHash());
 			getFileOutputPath().getParent().toFile().mkdirs();
 			Files.write(getFileOutputPath(), getOutput(cssContributors, markupContributors, transformer).getBytes(),
-				StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+				StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 			Files.write(getPropertiesOutputPath(), CssScopeMetadata.getMetaDataAsString(getMetaData()).getBytes(),
-				StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+				StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 		}
 	}
 

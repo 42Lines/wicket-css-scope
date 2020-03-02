@@ -17,13 +17,33 @@ public class WicketPanelMarkupContributor implements MarkupFragmentContributor {
 
 	@Override
 	public Optional<String> getMarkup() {
+		if (input.toLowerCase().contains("wicket:panel"))
+			return getPanelMarkup();
+		
+		if (input.toLowerCase().contains("wicket:extend"))
+			return getExtendsMarkup();
+		
+		return Optional.empty();
+	}
+	
+	private Optional<String> getPanelMarkup() {
 		if (!input.toLowerCase().contains("wicket:panel"))
-			return Optional.empty();
+			return getExtendsMarkup();
 
 		Document doc = Jsoup.parseBodyFragment(input);
 		doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
 
 		return Optional.of(doc.getElementsByTag("wicket:panel").html());
+	}
+	
+	private Optional<String> getExtendsMarkup() {
+		if (!input.toLowerCase().contains("wicket:extend"))
+			return Optional.empty();
+
+		Document doc = Jsoup.parseBodyFragment(input);
+		doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+
+		return Optional.of(doc.getElementsByTag("wicket:extend").html());
 	}
 
 }

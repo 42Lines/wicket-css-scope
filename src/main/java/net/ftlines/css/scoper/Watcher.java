@@ -29,11 +29,24 @@ public class Watcher implements Runnable {
 
 	private Function<Path, Boolean> isWatchableFunction;
 	private Consumer<Path> processingFunction;
+	private Consumer<Phase> phaseChangeFunction;
+	
+	public enum Phase {
+		STARTUP, WATCHING
+	}
+	
+	private Phase phase = Phase.STARTUP;
 
 	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction)
 		throws Exception {
+		this(inputRoot, isWatchableFunction, (c) ->{}, processingFunction);
+	}
+	
+	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction)
+		throws Exception {
 		inputRootPath = inputRoot;
 		this.isWatchableFunction = isWatchableFunction;
+		this.phaseChangeFunction = phaseChangeFunction;
 		this.processingFunction = processingFunction;
 	}
 
@@ -49,6 +62,8 @@ public class Watcher implements Runnable {
 
 	public void start() throws Exception {
 
+		phase = Phase.STARTUP;
+		phaseChangeFunction.accept(phase);
 		Files.walk(inputRootPath, FileVisitOption.FOLLOW_LINKS).filter(p -> isWatchableFunction.apply(p))
 			.map(inputRootPath::relativize).forEach(processingFunction);
 		Thread.sleep(500);
@@ -56,6 +71,9 @@ public class Watcher implements Runnable {
 		watchService = FileSystems.getDefault().newWatchService();
 		registerRecursive(watchService, inputRootPath);
 
+		phase = Phase.WATCHING;
+		phaseChangeFunction.accept(phase);
+		
 		WatchKey key;
 		while ((key = watchService.take()) != null) {
 			for (WatchEvent<?> event : key.pollEvents()) {
@@ -127,10 +145,15 @@ public class Watcher implements Runnable {
 	}
 
 	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction,
-		Consumer<Path> processingFunction) throws Exception {
-		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, processingFunction));
+		Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction) throws Exception {
+		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, phaseChangeFunction, processingFunction));
 		watcher.setDaemon(true);
 		watcher.start();
+	}
+	
+	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction,
+		Consumer<Path> processingFunction) throws Exception {
+		startAsDaemon(inputRoot, isWatchableFunction, (p) ->{},  processingFunction);
 	}
 
 	public static Function<Path, Boolean> isFileWatchableFunction(String... extensions) {

@@ -7,27 +7,27 @@ import org.jsoup.nodes.Document;
 
 import net.ftlines.css.scoper.MarkupFragmentContributor;
 
-public class WicketPanelMarkupContributor implements MarkupFragmentContributor {
+public class WicketExtendsMarkupContributor implements MarkupFragmentContributor {
 
 	private String input;
 
-	public WicketPanelMarkupContributor(String input) {
+	public WicketExtendsMarkupContributor(String input) {
 		this.input = input;
 	}
 
 	@Override
 	public Optional<String> getMarkup() {
-		if (!isWicketPanel(input))
+		if (!isWicketExtend(input))
 			return Optional.empty();
 
 		Document doc = Jsoup.parseBodyFragment(input);
 		doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
 
-		return Optional.of(doc.getElementsByTag("wicket:panel").html());
+		return Optional.of(doc.getElementsByTag("wicket:extend").html());
 	}
 	
-	public static boolean isWicketPanel(String input) {
-		return input.toLowerCase().contains("wicket:panel");
+	public static boolean isWicketExtend(String input) {
+		return input.toLowerCase().contains("wicket:extend");
 	}
 
 }

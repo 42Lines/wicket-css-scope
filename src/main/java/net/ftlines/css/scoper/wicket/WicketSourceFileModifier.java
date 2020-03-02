@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import io.bit3.jsass.Options;
@@ -32,12 +33,25 @@ public class WicketSourceFileModifier extends AbstractSourceFileModifier {
 
 	@Override
 	protected List<MarkupFragmentContributor> createMarkupFragmentContributor(String input) {
-		return Arrays.asList(new WicketPanelMarkupContributor(input));
+		if(WicketPanelMarkupContributor.isWicketPanel(input)) {
+			return Arrays.asList(new WicketPanelMarkupContributor(input));
+		} else if(WicketExtendsMarkupContributor.isWicketExtend(input)) {
+			return Arrays.asList(new WicketExtendsMarkupContributor(input));
+		}
+		
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected PanelizedMarkupTransformer createPanelizedMarkupTransformer(String input) {
-		return new WicketPanelMarkupTransformer(input);
+		
+		if(WicketPanelMarkupContributor.isWicketPanel(input)) {
+			return new WicketPanelMarkupTransformer(input);
+		} else if(WicketExtendsMarkupContributor.isWicketExtend(input)) {
+			return new WicketExtendMarkupTransformer(input);
+		}
+		
+		throw new RuntimeException("No transformer defined for input");
 	}
 	
 	protected Collection<Importer> getAllScssImporters() {

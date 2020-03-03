@@ -23,6 +23,10 @@ public class WicketPanelMarkupTransformer implements PanelizedMarkupTransformer 
 	}
 
 	private String getOtherNonStyleHeadElements() {
+		
+		if(!sourceInput.toLowerCase().contains("wicket:head"))
+			return "";
+		
 		Document doc = Jsoup.parseBodyFragment(sourceInput);
 		Elements headTags = doc.getElementsByTag("wicket:head");
 		headTags.select("style").remove();

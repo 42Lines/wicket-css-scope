@@ -4,8 +4,12 @@ import static org.antlr.v4.runtime.CharStreams.fromString;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,6 +23,9 @@ import org.junit.jupiter.api.Test;
 
 import antlr.css3.css3Lexer;
 import antlr.css3.css3Parser;
+import io.bit3.jsass.Options;
+import net.ftlines.css.scoper.wicket.WicketExtendsMarkupContributor;
+import net.ftlines.css.scoper.wicket.WicketPanelScssContributor;
 
 class CssSelectorReplaceTest {
 
@@ -84,6 +91,17 @@ class CssSelectorReplaceTest {
 		assertEquals(".fghij .klmno {}", replace(".simpleStyle #otherStyle {}", p));
 		assertEquals(".fghij.klmno {}", replace(".simpleStyle#otherStyle {}", p));
 		assertEquals(".klmno .fghij{}", replace("#otherStyle .simpleStyle{}", p));
+	}
+	
+	@Test
+	void testScopeOuterElementsReplace() {
+		Properties p = new Properties();
+		p.setProperty(CssSelectorReplace.SCOPE_PROPERTY, "abcde");
+		p.setProperty(CssSelectorReplace.getPropertyKey(CssSelectorReplace.CLASS_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT, ".simpleStyle"), "fghij");
+		p.setProperty(CssSelectorReplace.getPropertyKey(CssSelectorReplace.HASH_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT, "#otherStyle"), "klmno");
+		
+		assertEquals("h1.abcde, .abcde h1 {}", replace("h1 {}", p));
+
 	}
 
 	
@@ -157,10 +175,37 @@ class CssSelectorReplaceTest {
 	public static void main(String[] args) throws IOException {
 		//viz("#eee { background-color: #FFF;}");
 		
-		viz(".class-grades .form-list .label {	width:120px; }");
+//		viz(".class-grades .form-list .label {	width:120px; }");
+		
+		String input = getFileContents(Paths.get("/Users/peter/git/harmonize/application/lms/src/main/java/net/ftlines/lms/pages/login/LoginPage.html"));
+		
+		WicketPanelScssContributor scss = new WicketPanelScssContributor(input) {
+			@Override
+			protected void configureOptions(Options options) {
+				super.configureOptions(options);
+				options.getImporters().add(new FilePathScssImportResolver(Paths.get("/Users/peter/git/harmonize/application/lms/src/main/java/net/ftlines/lms/components/css")));
+			}
+		};
+		
+		ScopedFragmentResult results = ScopedFragmentResult.transform(CssSyleFragmentContributor.combine(scss),
+			MarkupFragmentContributor.combine(new WicketExtendsMarkupContributor(input)), new CssScopeMetadata(new Properties()), true);
+		
+		System.out.println(results.getScopedCss());
 		
 //		viz(new WicketPanelCssContributor(AbstractSourceFileModifier.pathAsString(Paths.get(
-//			"/Users/peter/git/harmonize/application/lms/target/classes/net/ftlines/lms/discussion/activity/classic/GradeByTypePanel.html"))).getCss().get());
+//			"/Users/peter/git/harmonize/application/lms/src/main/java/net/ftlines/lms/pages/login/LoginPage.html"))).getCss().get());
+	}
+	
+	private static String getFileContents(Path p) {
+		try {
+			return pathAsString(p);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static String pathAsString(Path file) throws IOException {
+		return Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
 	}
 	
 }

@@ -176,6 +176,7 @@ public class CssSelectorReplace extends css3BaseListener {
 	@Override
 	public void enterSelector(SelectorContext ctx) {
 		super.enterSelector(ctx);
+
 		if (externalAnnotationRefCount == 0  && containerAnnotationRefCount > 0) {
 			if (isUnscopedTypeSelector(ctx)) {
 				if (getOperationSequence().stream().noneMatch(this::isOuterScopeAssignement)) {
@@ -199,6 +200,27 @@ public class CssSelectorReplace extends css3BaseListener {
 			} else {
 				rewriter.insertBefore(ctx.start, "." + scope + " ");
 			}
+		} else if (externalAnnotationRefCount == 0  && containerAnnotationRefCount == 0 && isUnscopedTypeSelector(ctx)) {
+			
+			if (getOperationSequence().stream().noneMatch(this::isOuterScopeAssignement)) {
+				operationSequence.add(new CssTransformationOperation(CssTransformationOperationType.OUTERSCOPE_ASSIGNMENT,
+					null, "." + scope	));
+			}
+			
+			String origSelector = ctx.getText();
+
+			AtomicBoolean flag = new AtomicBoolean(false);
+			String topShared = Arrays.asList(origSelector.strip().split(" ")).stream().map(str -> {
+				if (!flag.get()) {
+					flag.set(true);
+					return str.strip() + "." + scope;
+				}
+				return str.strip();
+			}).collect(Collectors.joining(" "));
+
+			String newSelector = topShared + ", ." + scope + " ";
+			rewriter.insertBefore(ctx.start, newSelector);
+			
 		}
 	}
 	

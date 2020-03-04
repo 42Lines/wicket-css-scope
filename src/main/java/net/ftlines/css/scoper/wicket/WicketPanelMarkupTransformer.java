@@ -17,9 +17,31 @@ public class WicketPanelMarkupTransformer implements PanelizedMarkupTransformer 
 
 	@Override
 	public String apply(ScopedFragmentResult compiledFragments) {
-		return "<html xmlns:wicket>\n" + "<wicket:head>\n<style>\n" + compiledFragments.getScopedCss() + "\n"
-			+ "</style>" + getOtherNonStyleHeadElements() + "\n</wicket:head>\n<wicket:panel>"
-			+ compiledFragments.getScopedMarkup() + "\n</wicket:panel>" + "</html>";
+		return "<html xmlns:wicket>\n" // 
+			+ composeHead(compiledFragments) // 
+			+ composeBody(compiledFragments)  //
+			+ "</html>"; //
+	}
+	
+	protected String composeBody(ScopedFragmentResult compiledFragments) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<wicket:panel>").append("\n");
+		buffer.append(compiledFragments.getScopedMarkup()).append("\n");
+		buffer.append("</wicket:panel>").append("\n");
+		return buffer.toString();
+	}
+	
+	protected String composeHead(ScopedFragmentResult compiledFragments) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<wicket:head>").append("\n");
+		buffer.append("<style compiled=\"true\">").append("\n");
+		buffer.append(compiledFragments.getScopedCss()).append("\n");
+		buffer.append("</style>").append("\n\n");
+		
+		buffer.append(getOtherNonStyleHeadElements()).append("\n");
+		
+		buffer.append("</wicket:head>").append("\n");
+		return buffer.toString();
 	}
 
 	private String getOtherNonStyleHeadElements() {

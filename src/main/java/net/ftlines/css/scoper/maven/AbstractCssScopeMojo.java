@@ -21,6 +21,9 @@ public abstract class AbstractCssScopeMojo extends AbstractMojo {
 	@Parameter(required = false)
 	public File[] scssImportRoot;
 
+	@Parameter
+	public File singleFileOutputPath;
+	
 	protected FileSetManager fileSetManager = new FileSetManager();
 
 }

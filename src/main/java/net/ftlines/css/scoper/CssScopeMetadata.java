@@ -16,10 +16,14 @@ public class CssScopeMetadata {
 	public CssScopeMetadata(Properties properties) {
 		this.properties = properties;
 	}
+	
+	public String getValue(String key) {
+		return getValue(key, null);
+	}
 
 	public String getValue(String key, Supplier<String> defaultIfMissing) {
 		String newToken = properties.getProperty(key);
-		if (newToken == null) {
+		if (newToken == null && defaultIfMissing != null) {
 			newToken = defaultIfMissing.get();
 			properties.setProperty(key, newToken);
 		}

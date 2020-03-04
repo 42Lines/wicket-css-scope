@@ -23,24 +23,32 @@ public class WicketPanelMarkupTransformer implements PanelizedMarkupTransformer 
 			+ "</html>"; //
 	}
 	
+	protected String getWicketTag() {
+		return "wicket:panel";
+	}
+	
 	protected String composeBody(ScopedFragmentResult compiledFragments) {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("<wicket:panel>").append("\n");
+		buffer.append("<"+getWicketTag()+">").append("\n");
 		buffer.append(compiledFragments.getScopedMarkup()).append("\n");
-		buffer.append("</wicket:panel>").append("\n");
+		buffer.append("</"+getWicketTag()+">").append("\n");
 		return buffer.toString();
 	}
 	
 	protected String composeHead(ScopedFragmentResult compiledFragments) {
+		String head = composeStyle(compiledFragments).strip() + getOtherNonStyleHeadElements().strip();
+		if(head.length() > 0) {
+			return "<wicket:head>" + head + "</wicket:head>";
+		}
+		
+		return "";
+	}
+	
+	protected String composeStyle(ScopedFragmentResult compiledFragments) {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("<wicket:head>").append("\n");
 		buffer.append("<style compiled=\"true\">").append("\n");
 		buffer.append(compiledFragments.getScopedCss()).append("\n");
 		buffer.append("</style>").append("\n\n");
-		
-		buffer.append(getOtherNonStyleHeadElements()).append("\n");
-		
-		buffer.append("</wicket:head>").append("\n");
 		return buffer.toString();
 	}
 

@@ -100,10 +100,16 @@ public abstract class AbstractSourceFileModifier {
 
 	private String getOutput(List<CssSyleFragmentContributor> cssContributors,
 		List<MarkupFragmentContributor> markupContributors, PanelizedMarkupTransformer transformer) {
+		CssScopeMetadata meta = getMetaData();
+		meta.setValue(CssSelectorReplace.SCOPE_SOURCE_NAME, getSourceMapName());
 		return transformer.apply(ScopedFragmentResult.transform(CssSyleFragmentContributor.combine(cssContributors),
-			MarkupFragmentContributor.combine(markupContributors), getMetaData(), debugMode));
+			MarkupFragmentContributor.combine(markupContributors), meta, debugMode));
 	}
 
+	private String getSourceMapName() {
+		return filePath.toString();
+	}
+	
 	public Path getFileOutputPath() {
 		return outputRoot.resolve(filePath);
 	}

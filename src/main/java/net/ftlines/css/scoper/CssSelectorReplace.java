@@ -2,12 +2,9 @@ package net.ftlines.css.scoper;
 
 import static org.antlr.v4.runtime.CharStreams.fromString;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -31,11 +28,11 @@ import antlr.css3.css3Parser.TypeSelectorContext;
 import antlr.css3.css3Parser.UnknownRulesetContext;
 import net.ftlines.css.scoper.ScopedFragmentResult.CssTransformationOperation;
 import net.ftlines.css.scoper.ScopedFragmentResult.CssTransformationOperationType;
-import net.ftlines.css.scoper.wicket.WicketPanelCssContributor;
 
 public class CssSelectorReplace extends css3BaseListener {
 
 	public static final String SCOPE_PROPERTY = "scope";
+	public static final String SCOPE_SOURCE_NAME = "src";
 
 	public static final String CLASS_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT = "classnamecontext.%s.computed_scope";
 	public static final String CLASS_CONTEXT_OPERATION_PROPERTY_FORMAT = "classnamecontext.%s.operation";
@@ -275,11 +272,5 @@ public class CssSelectorReplace extends css3BaseListener {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
-		
-		System.out.println(parse(new WicketPanelCssContributor(AbstractSourceFileModifier.pathAsString(Paths.get(
-			"/Users/peter/git/harmonize/application/lms/target/classes/net/ftlines/lms/discussion/activity/classic/GradeByTypePanel.html"))).getCss().get(), 
-			new CssScopeMetadata(new Properties()), true).getOutput());
-	}
 
 }

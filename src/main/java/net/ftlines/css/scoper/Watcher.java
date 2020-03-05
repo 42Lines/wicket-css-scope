@@ -32,20 +32,26 @@ public class Watcher implements Runnable {
 	private Consumer<Phase> phaseChangeFunction;
 	
 	public enum Phase {
-		STARTUP, WATCHING
+		STARTUP, WATCHING, REBUILDING
 	}
 	
 	private Phase phase = Phase.STARTUP;
+	private Function<Path, Boolean> isFullRecompileTriggerFunction;
 
 	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction)
 		throws Exception {
-		this(inputRoot, isWatchableFunction, (c) ->{}, processingFunction);
+		this(inputRoot, isWatchableFunction, (p) -> false, (c) ->{}, processingFunction);
 	}
 	
-	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction)
+	public Watcher(Path inputRoot, 
+		Function<Path, Boolean> isWatchableFunction, 
+		Function<Path, Boolean> isFullRecompileTriggerFunction, 
+		Consumer<Phase> phaseChangeFunction, 
+		Consumer<Path> processingFunction)
 		throws Exception {
 		inputRootPath = inputRoot;
 		this.isWatchableFunction = isWatchableFunction;
+		this.isFullRecompileTriggerFunction = isFullRecompileTriggerFunction;
 		this.phaseChangeFunction = phaseChangeFunction;
 		this.processingFunction = processingFunction;
 	}
@@ -64,8 +70,11 @@ public class Watcher implements Runnable {
 
 		phase = Phase.STARTUP;
 		phaseChangeFunction.accept(phase);
-		Files.walk(inputRootPath, FileVisitOption.FOLLOW_LINKS).filter(p -> isWatchableFunction.apply(p))
-			.map(inputRootPath::relativize).forEach(processingFunction);
+		try {
+			reProcessAllFiles();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		Thread.sleep(500);
 
 		watchService = FileSystems.getDefault().newWatchService();
@@ -82,13 +91,35 @@ public class Watcher implements Runnable {
 				Path workingDirPath = dir.resolve((Path) event.context());
 
 				Path p = inputRootPath.relativize(workingDirPath).normalize();
-
-				if (isWatchableFunction.apply(p)) {
-					processingFunction.accept(p);
+				try {
+					onChange(p);
+				} catch(Exception e) {
+					e.printStackTrace();
 				}
 			}
 			key.reset();
 		}
+	}
+	
+	private void onChange(Path p) throws IOException {
+		if (isWatchableFunction.apply(p)) {
+			processingFunction.accept(p);
+		}
+		
+		if(isFullRecompileTriggerFunction.apply(p)) {
+			phase = Phase.REBUILDING;
+			phaseChangeFunction.accept(phase);
+			
+			reProcessAllFiles();
+			
+			phase = Phase.WATCHING;
+			phaseChangeFunction.accept(phase);
+		}
+	}
+
+	private void reProcessAllFiles() throws IOException {
+		Files.walk(inputRootPath, FileVisitOption.FOLLOW_LINKS).filter(p -> isWatchableFunction.apply(p))
+			.map(inputRootPath::relativize).forEach(processingFunction);
 	}
 
 	private void registerRecursive(WatchService watchService, final Path root) throws IOException {
@@ -114,7 +145,7 @@ public class Watcher implements Runnable {
 
 	private boolean pathContainsWatchable(Path dir) {
 		try (Stream<Path> stream = Files.walk(dir)) {
-			return stream.filter(file -> !Files.isDirectory(file)).filter(p -> isWatchableFunction.apply(p)).findAny()
+			return stream.filter(file -> !Files.isDirectory(file)).filter(p -> isWatchableFunction.apply(p) || isFullRecompileTriggerFunction.apply(p)).findAny()
 				.isPresent();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -145,21 +176,38 @@ public class Watcher implements Runnable {
 	}
 
 	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction,
-		Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction) throws Exception {
-		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, phaseChangeFunction, processingFunction));
+		Function<Path, Boolean> isFullRebuildTrigger, Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction) throws Exception {
+		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, isFullRebuildTrigger, phaseChangeFunction, processingFunction));
 		watcher.setDaemon(true);
 		watcher.start();
 	}
 	
-	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction,
-		Consumer<Path> processingFunction) throws Exception {
-		startAsDaemon(inputRoot, isWatchableFunction, (p) ->{},  processingFunction);
+	@SafeVarargs
+	public static Function<Path, Boolean> allOf(Function<Path, Boolean> ... funcs) {
+		return (p) -> {
+			boolean flag = true;
+			for (Function<Path, Boolean> ext : funcs) {
+				flag &= ext.apply(p);
+			}
+			return flag;
+		};
 	}
 
-	public static Function<Path, Boolean> isFileWatchableFunction(String... extensions) {
+	public static Function<Path, Boolean> isFileEndsWithFunction(String... extensions) {
 		return (p) -> {
 			for (String ext : extensions) {
 				if (p.toString().toLowerCase().endsWith(ext.toLowerCase())) {
+					return true;
+				}
+			}
+			return false;
+		};
+	}
+	
+	public static Function<Path, Boolean> isFileNameStartsWithFunction(String... prefix) {
+		return (p) -> {
+			for (String ext : prefix) {
+				if (p.getFileName().toString().toLowerCase().startsWith(ext.toLowerCase())) {
 					return true;
 				}
 			}

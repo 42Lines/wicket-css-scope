@@ -34,7 +34,8 @@ public class WatchMojo extends AbstractCssScopeMojo {
 		
 		try {
 			new Watcher(inputRootPath, 
-				Watcher.isFileWatchableFunction(".html", ".css", ".js"), 
+				Watcher.isFileEndsWithFunction(".html", ".css", ".js"),
+				Watcher.allOf(Watcher.isFileEndsWithFunction(".scss"), Watcher.isFileNameStartsWithFunction("_")),
 				compiler::setPhase, 
 				compiler::process
 			).start();

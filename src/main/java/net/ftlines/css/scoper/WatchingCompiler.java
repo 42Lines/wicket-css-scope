@@ -39,6 +39,11 @@ public class WatchingCompiler {
 	};
 	
 	public void setPhase(Phase p) {
+		
+		if(p == Phase.REBUILDING) {
+			logString(phase.get(), "Dependency changed...rebuilding all.");
+		}
+		
 		phase.set(p);
 		writeSingleStyleSheet();
 	}
@@ -83,7 +88,7 @@ public class WatchingCompiler {
 
 				@Override
 				protected void logString(String message) {
-					WatchingCompiler.this.logString(message);
+					WatchingCompiler.this.logString(phase.get(), message);
 				}
 				
 			};
@@ -104,13 +109,13 @@ public class WatchingCompiler {
 
 			@Override
 			protected void logString(String message) {
-				WatchingCompiler.this.logString(message);
+				WatchingCompiler.this.logString(phase.get(), message);
 			}
 			
 		};
 	}
 	
-	protected void logString(String message) {
+	protected void logString(Phase p, String message) {
 		System.out.println(message);
 	}
 	

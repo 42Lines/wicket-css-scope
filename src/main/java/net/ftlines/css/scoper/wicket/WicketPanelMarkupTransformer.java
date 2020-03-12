@@ -59,7 +59,7 @@ public class WicketPanelMarkupTransformer implements PanelizedMarkupTransformer 
 		
 		Document doc = Jsoup.parseBodyFragment(sourceInput);
 		Elements headTags = doc.getElementsByTag("wicket:head");
-		headTags.select("style").remove();
+		headTags.select("style:not([ignore_compile])").remove();
 		return headTags.get(0).html();
 	}
 

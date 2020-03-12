@@ -26,10 +26,10 @@ public class WicketPanelCssContributor implements CssSyleFragmentContributor {
 		if (doc.getElementsByTag("wicket:head").size() == 0)
 			return Optional.empty();
 
-		if (doc.getElementsByTag("wicket:head").select("style").size() == 0)
+		if (doc.getElementsByTag("wicket:head").select("style:not([ignore_compile])").size() == 0)
 			return Optional.empty();
 
-		return Optional.of(doc.getElementsByTag("wicket:head").select("style").html());
+		return Optional.of(doc.getElementsByTag("wicket:head").select("style:not([ignore_compile])").html());
 	}
 
 }

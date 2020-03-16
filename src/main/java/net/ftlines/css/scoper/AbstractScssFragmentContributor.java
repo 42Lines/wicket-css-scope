@@ -17,6 +17,8 @@ import io.bit3.jsass.importer.Importer;
 public abstract class AbstractScssFragmentContributor implements CssSyleFragmentContributor {
 
 	public abstract Optional<String> getScss();
+	
+	private static final String OBF_PREFIX = "__________________________";
 
 	@Override
 	public Optional<String> getCss() {
@@ -34,7 +36,16 @@ public abstract class AbstractScssFragmentContributor implements CssSyleFragment
 		configureOptions(options);
 
 		try {
-			return Optional.of(new Compiler().compileString(scss.get(), options).getCss());
+			
+			String scssRaw = scss.get();
+			scssRaw = scssRaw.replace("@external", OBF_PREFIX + "external");
+			scssRaw = scssRaw.replace("@container", OBF_PREFIX + "container");
+			
+			String resultCss = new Compiler().compileString(scssRaw, options).getCss();
+			resultCss = resultCss.replace(OBF_PREFIX + "external", "@external");
+			resultCss = resultCss.replace(OBF_PREFIX + "container", "@container");
+
+			return Optional.of(resultCss);
 		} catch (CompilationException e) {
 			throw new RuntimeException(e);
 		}

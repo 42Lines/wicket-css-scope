@@ -37,6 +37,8 @@ public class WicketSourceFileModifier extends AbstractSourceFileModifier {
 			return Arrays.asList(new WicketPanelMarkupContributor(input));
 		} else if(WicketExtendsMarkupContributor.isWicketExtend(input)) {
 			return Arrays.asList(new WicketExtendsMarkupContributor(input));
+		} else if(WicketPageMarkupContributor.isWicketPage(input)) {
+			return Arrays.asList(new WicketPageMarkupContributor(input));
 		}
 		
 		return Collections.emptyList();
@@ -49,6 +51,8 @@ public class WicketSourceFileModifier extends AbstractSourceFileModifier {
 			return new WicketPanelMarkupTransformer(input);
 		} else if(WicketExtendsMarkupContributor.isWicketExtend(input)) {
 			return new WicketExtendMarkupTransformer(input);
+		} else if(WicketPageMarkupContributor.isWicketPage(input)) {
+			return new WicketPageMarkupTransformer(input);
 		}
 		
 		throw new RuntimeException("No transformer defined for input");

@@ -14,6 +14,10 @@ public class WicketPanelMarkupTransformer implements PanelizedMarkupTransformer 
 	public WicketPanelMarkupTransformer(String sourceInput) {
 		this.sourceInput = sourceInput;
 	}
+	
+	public String getSourceInput() {
+		return sourceInput;
+	}
 
 	@Override
 	public String apply(ScopedFragmentResult compiledFragments) {
@@ -52,7 +56,7 @@ public class WicketPanelMarkupTransformer implements PanelizedMarkupTransformer 
 		return buffer.toString();
 	}
 
-	private String getOtherNonStyleHeadElements() {
+	protected String getOtherNonStyleHeadElements() {
 		
 		if(!sourceInput.toLowerCase().contains("wicket:head"))
 			return "";

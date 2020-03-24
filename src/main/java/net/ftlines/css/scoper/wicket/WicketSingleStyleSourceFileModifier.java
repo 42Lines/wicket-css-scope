@@ -34,6 +34,14 @@ public class WicketSingleStyleSourceFileModifier extends WicketSourceFileModifie
 					return "";
 				}
 			};
+		} else if(WicketPageMarkupContributor.isWicketPage(input)) {
+			return new WicketPageMarkupTransformer(input) {
+				@Override
+				protected String composeStyle(ScopedFragmentResult compiledFragments) {
+					styleCollection.addOrReplace(compiledFragments);
+					return "";
+				}
+			};
 		}
 		
 		throw new RuntimeException("No transformer defined for input");

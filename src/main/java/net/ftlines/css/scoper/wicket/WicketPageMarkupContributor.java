@@ -27,8 +27,13 @@ public class WicketPageMarkupContributor implements MarkupFragmentContributor {
 		return Optional.of(doc.getElementsByTag("body").html());
 	}
 	
-	public static boolean isWicketPage(String input) {
-		return input.toLowerCase().contains("<body");
+	public static boolean isWicketPage(String input) {		
+		if(input.toLowerCase().contains("body")) {
+			Document doc = Jsoup.parse(input, "", Parser.xmlParser());
+			return doc.getElementsByTag("body").size() > 0;
+		}
+		
+		return false;
 	}
 
 }

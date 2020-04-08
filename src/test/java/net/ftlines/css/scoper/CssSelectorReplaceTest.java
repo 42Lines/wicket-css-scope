@@ -2,6 +2,7 @@ package net.ftlines.css.scoper;
 
 import static org.antlr.v4.runtime.CharStreams.fromString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -135,7 +136,25 @@ class CssSelectorReplaceTest {
 		
 	}
 	
+	@Test
+	void testDualAtMediaErrors() {
+		
+		Properties p = new Properties();
+		p.setProperty(CssSelectorReplace.SCOPE_PROPERTY, "abcde");
+		p.setProperty(CssSelectorReplace.getPropertyKey(CssSelectorReplace.CLASS_CONTEXT_COMPUTED_SCOPE_PROPERTY_FORMAT, ".button-container3"), "fghij");
 	
+		String input = 
+			"@media only screen and (max-width: 849px) {" + 
+			"   @container .button-container1 { max-width: 45%; }\n" +
+			"   .button-container3 { max-width: 45%; }\n" +
+			"} \n" + 
+			"@container .button-container2 { min-width: 230px; }" ;
+
+		String output = replace(input, p);
+		assertTrue(output.contains(".abcde .button-container1 {"));
+		assertTrue(output.contains(".abcde .button-container2 {"));
+		assertTrue(output.contains(".fghij {"));
+	}
 	
 	
 	public static String replace(String cssBody, Properties p) {

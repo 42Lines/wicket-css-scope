@@ -80,8 +80,6 @@ public class CssSelectorReplace extends css3BaseListener {
 		rewriter.replace(ctx.start, ctx.stop, "");
 	}
 
-	
-
 	@Override
 	public void enterClassName(ClassNameContext ctx) {
 		super.enterClassName(ctx);

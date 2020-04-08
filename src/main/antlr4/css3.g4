@@ -283,7 +283,7 @@ nestedStatement
     ;
 
 groupRuleBody
-    : '{' ws nestedStatement* '}' ws
+    : '{' ws ( external | containerScope )* nestedStatement* '}' ws
     ;
 
 supportsRule
@@ -751,6 +751,7 @@ external
 containerScope
     : '@container;' ws
     | '@container' ws
+    | '$$container' ws
     ;     
 
 Important

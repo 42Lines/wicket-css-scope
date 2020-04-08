@@ -7,8 +7,10 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -61,19 +63,32 @@ public class StyleCollectionWriter {
 		
 		StringBuffer buffer = new StringBuffer();
 		int mapLine = 1;
-		for(Entry<String, String> compStyle: styleMap.entrySet()) {
+		
+		ArrayList<Entry<String, String>> orderedOutput = new ArrayList<>(styleMap.entrySet());
+		Collections.sort(orderedOutput, new Comparator<Entry<String, String>>() {
+			@Override
+			public int compare(Entry<String, String> o1, Entry<String, String> o2) {
+				String o1Name = nameMap.get(o1.getKey());
+				String o2Name = nameMap.get(o2.getKey());
+				return o1Name.compareToIgnoreCase(o2Name);
+			}
+		});
+		
+		for(Entry<String, String> compStyle: orderedOutput) {
 			StringBuffer inner = new StringBuffer();
 			String[] lines = compStyle.getValue().split(System.getProperty("line.separator"));		
 			Arrays.asList(lines).forEach(l -> {
 				inner.append(" ").append(l.strip()).append(" ");
 			});
 			String line =  inner.toString().strip();
+			line += "   ." + compStyle.getKey() + "___reset { }"; //This is to catch any malformed styles from bleeding into the next section
+			
 			if(line.length() > 0) {
 				String srcName = nameMap.get(compStyle.getKey());
 				g.addSourcesContent(srcName, sourceMap.get(compStyle.getKey()));
 				g.addMapping(srcName, "", new FilePosition(0, 0), new FilePosition(mapLine, 0), new FilePosition(mapLine+2, 0));
 
-				buffer.append("/* " + compStyle.getKey() + " */ ")
+				buffer.append("/* " + compStyle.getKey() + " - " + srcName + " */ ")
 					.append(System.getProperty("line.separator"))
 					.append(line)
 					.append(System.getProperty("line.separator"))

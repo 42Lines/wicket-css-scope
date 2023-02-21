@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.ftlines</groupId>
 	<artifactId>wicket-css-scope</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	
 	<name>42 Lines - Wicket Css Scoping</name>
@@ -72,7 +72,7 @@
 		<dependency>
     		<groupId>com.google.javascript</groupId>
     		<artifactId>closure-compiler</artifactId>
-   			<version>v20200224</version>
+   			<version>v20230206</version>
 		</dependency>
 
 		<dependency>

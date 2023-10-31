@@ -37,19 +37,13 @@ public class Watcher implements Runnable {
 	
 	private Phase phase = Phase.STARTUP;
 	private Function<Path, Boolean> isFullRecompileTriggerFunction;
-
-	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, Consumer<Path> processingFunction)
-		throws Exception {
-		this(inputRoot, isWatchableFunction, (p) -> false, (c) ->{}, processingFunction);
-	}
 	
-	public Watcher(Path inputRoot, 
-		Function<Path, Boolean> isWatchableFunction, 
+	public Watcher(Path inputRoot, Function<Path, Boolean> isWatchableFunction, 
 		Function<Path, Boolean> isFullRecompileTriggerFunction, 
 		Consumer<Phase> phaseChangeFunction, 
 		Consumer<Path> processingFunction)
 		throws Exception {
-		inputRootPath = inputRoot;
+		this.inputRootPath = inputRoot;
 		this.isWatchableFunction = isWatchableFunction;
 		this.isFullRecompileTriggerFunction = isFullRecompileTriggerFunction;
 		this.phaseChangeFunction = phaseChangeFunction;
@@ -86,7 +80,6 @@ public class Watcher implements Runnable {
 		WatchKey key;
 		while ((key = watchService.take()) != null) {
 			for (WatchEvent<?> event : key.pollEvents()) {
-
 				Path dir = (Path) key.watchable();
 				Path workingDirPath = dir.resolve((Path) event.context());
 
@@ -117,7 +110,7 @@ public class Watcher implements Runnable {
 		}
 	}
 
-	private void reProcessAllFiles() throws IOException {
+	public void reProcessAllFiles() throws IOException {
 		Files.walk(inputRootPath, FileVisitOption.FOLLOW_LINKS).filter(p -> isWatchableFunction.apply(p))
 			.map(inputRootPath::relativize).forEach(processingFunction);
 	}
@@ -175,12 +168,12 @@ public class Watcher implements Runnable {
 
 	}
 
-	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction,
-		Function<Path, Boolean> isFullRebuildTrigger, Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction) throws Exception {
-		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, isFullRebuildTrigger, phaseChangeFunction, processingFunction));
-		watcher.setDaemon(true);
-		watcher.start();
-	}
+//	public static void startAsDaemon(Path inputRoot, Function<Path, Boolean> isWatchableFunction,
+//		Function<Path, Boolean> isFullRebuildTrigger, Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction) throws Exception {
+//		Thread watcher = new Thread(new Watcher(inputRoot, isWatchableFunction, isFullRebuildTrigger, phaseChangeFunction, processingFunction));
+//		watcher.setDaemon(true);
+//		watcher.start();
+//	}
 	
 	@SafeVarargs
 	public static Function<Path, Boolean> allOf(Function<Path, Boolean> ... funcs) {

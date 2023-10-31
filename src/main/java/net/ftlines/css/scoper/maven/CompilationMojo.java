@@ -11,6 +11,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import io.bit3.jsass.importer.Importer;
 import net.ftlines.css.scoper.AbstractScssFragmentContributor.FilePathScssImportResolver;
+import net.ftlines.css.scoper.StandardSassCompiler;
 import net.ftlines.css.scoper.StyleCollectionWriter;
 import net.ftlines.css.scoper.wicket.WicketSingleStyleSourceFileModifier;
 import net.ftlines.css.scoper.wicket.WicketSourceFileModifier;
@@ -33,6 +34,8 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 				StyleCollectionWriter styles = new StyleCollectionWriter();
 				executeUnifiedCompile(outputRootPath, inputRootPath, styles);
 				styles.writeTo(singleFileOutputPath.toPath());
+				
+				executeStandAloneCompile(outputRootPath, inputRootPath);
 			}
 
 		} catch (Exception e) {
@@ -40,6 +43,7 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 		}
 	}
 	
+
 	private void executeUnifiedCompile(Path outputRootPath, Path inputRootPath, StyleCollectionWriter styles) {
 		for (String f : fileSetManager.getIncludedFiles(fileset)) {
 			new WicketSingleStyleSourceFileModifier(Path.of(f), inputRootPath, outputRootPath, styles) {			
@@ -60,8 +64,32 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 
 	private void executePanalizedCompile(Path outputRootPath, Path inputRootPath) {
 		for (String f : fileSetManager.getIncludedFiles(fileset)) {
-			new WicketSourceFileModifier(Path.of(f), inputRootPath, outputRootPath) {
-				
+			executeSingleCompile(Path.of(f), outputRootPath, inputRootPath);
+		}
+	}
+	
+	private void executeStandAloneCompile(Path outputRootPath, Path inputRootPath) {
+		for (String f : fileSetManager.getIncludedFiles(fileset)) {
+			Path p = Path.of(f);
+			StandardSassCompiler.isStandardSassFile(p);
+			executeSingleCompile(p, outputRootPath, inputRootPath);
+		}
+	}
+	
+	private void executeSingleCompile(Path filePath, Path outputRootPath, Path inputRootPath) {
+		
+		if(StandardSassCompiler.isStandardSassFile(filePath)) {
+			new StandardSassCompiler(filePath, inputRootPath, outputRootPath) {
+				@Override
+				protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
+					Collection<Importer> list = super.getAllScssImporters();
+					list.add(createImporterSet(inputRootPath.resolve(filePath).toAbsolutePath().getParent().toFile(), list));
+					return list;
+				}
+			}.process();
+		} else {
+			new WicketSourceFileModifier(filePath, inputRootPath, outputRootPath) {
+
 				@Override
 				protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
 					Collection<Importer> list = super.getAllScssImporters();
@@ -72,9 +100,13 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 					}
 					return list;
 				}
-				
+
 			}.process();
 		}
+	}
+	
+	private Importer createImporterSet(File root, Collection<Importer> list) {
+		return new FilePathScssImportResolver(root.toPath());
 	}
 
 }

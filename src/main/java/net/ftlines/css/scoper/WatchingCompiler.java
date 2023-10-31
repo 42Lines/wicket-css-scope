@@ -53,7 +53,17 @@ public class WatchingCompiler {
 	}
 	
 	public void process(Path file) {
-		createModifier(file).setDebugMode(isDebugMode()).process();
+		if(StandardSassCompiler.isStandardSassFile(file)) {
+			createStandardSassCompiler(file).process();
+		} else {
+			createModifier(file).setDebugMode(isDebugMode()).process();
+		}
+		
+		onChange(file);
+	}
+	
+	protected void onChange(Path file) {
+		
 	}
 	
 	private void writeSingleStyleSheet() {
@@ -70,6 +80,21 @@ public class WatchingCompiler {
 		return false;
 	}
 	
+	private StandardSassCompiler createStandardSassCompiler(Path file) {
+		return new StandardSassCompiler(file, inputRootPath, outputRootPath) {
+			@Override
+			protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
+				return createImporterSetRelativeTo(file, super.getAllScssImporters());
+			}
+			
+			@Override
+			protected void logString(String message) {
+				WatchingCompiler.this.logString(phase.get(), message);
+			}
+			
+		};
+	}
+	
 	protected AbstractSourceFileModifier createModifier(Path file) {
 
 		if(singleFileOutputPath != null) {
@@ -77,13 +102,7 @@ public class WatchingCompiler {
 
 				@Override
 				protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
-					Collection<Importer> list = super.getAllScssImporters();
-					if(scssImportRoot != null) {
-						for(File root: scssImportRoot.get()) {
-							list.add(new FilePathScssImportResolver(root.toPath()));
-						}
-					}
-					return list;
+					return createImporterSet(super.getAllScssImporters());
 				}
 
 				@Override
@@ -98,13 +117,7 @@ public class WatchingCompiler {
 
 			@Override
 			protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
-				Collection<Importer> list = super.getAllScssImporters();
-				if(scssImportRoot != null) {
-					for(File root: scssImportRoot.get()) {
-						list.add(new FilePathScssImportResolver(root.toPath()));
-					}
-				}
-				return list;
+				return createImporterSet(super.getAllScssImporters());
 			}
 
 			@Override
@@ -113,6 +126,24 @@ public class WatchingCompiler {
 			}
 			
 		};
+	}
+	
+	private Collection<Importer> createImporterSet(Collection<Importer> list) {
+		if(scssImportRoot != null) {
+			for(File root: scssImportRoot.get()) {
+				list.add(createImporterSet(root, list));
+			}
+		}
+		return list;
+	}
+	
+	private Collection<Importer> createImporterSetRelativeTo(Path p, Collection<Importer> list) {
+		list.add(createImporterSet(inputRootPath.resolve(p).toAbsolutePath().getParent().toFile(), list));
+		return list;
+	}
+	
+	private Importer createImporterSet(File root, Collection<Importer> list) {
+		return new FilePathScssImportResolver(root.toPath());
 	}
 	
 	protected void logString(Phase p, String message) {

@@ -65,10 +65,12 @@ public abstract class AbstractScssFragmentContributor implements CssSyleFragment
 		
 		@Override
 		public Collection<Import> apply(String url, Import previous) {
-			if(Files.exists(root.resolve(url))) {
+			Path resolved = root.resolve(url);
+			if(Files.exists(resolved)) {
 				try {
-					URI uri = root.resolve(url).toUri();
-					return Collections.singleton(new Import(uri, uri, Files.readAllLines(root.resolve(url)).stream().collect(Collectors.joining("\n"))));
+					URI uri = resolved.toUri();
+					String content = Files.readAllLines(resolved).stream().collect(Collectors.joining("\n"));
+					return Collections.singleton(new Import(uri, uri, content));
 				} catch(Exception e) {
 					throw new RuntimeException(e);
 				}

@@ -14,9 +14,6 @@ public class ScopedFragmentResult {
 	private String newCss;
 	private String newHtml;
 
-	private ScopedFragmentResult() {
-	}
-
 	public ScopedFragmentResult(String oldCss, String oldHtml, String newCss, String newHtml,
 		CssScopeMetadata metadata) {
 		super();

@@ -79,23 +79,35 @@ public class Watcher implements Runnable {
 			}
 			Thread.sleep(500);
 
-			WatchService watchService = FileSystems.getDefault().newWatchService();
-			List<WatchKey> registeredKeys = new ArrayList<>();
-			registeredKeys.addAll(registerRecursiveSourceWatchables(watchService, inputRootPath));
-			registeredKeys.addAll(registerRecursiveTargetWatchables(watchService, outputRootPath));
+			try(WatchService watchService = FileSystems.getDefault().newWatchService()) {
+				List<WatchKey> registeredKeys = new ArrayList<>();
+				registeredKeys.addAll(registerRecursiveSourceWatchables(watchService, inputRootPath));
+				registeredKeys.addAll(registerRecursiveTargetWatchables(watchService, outputRootPath));
 
-			phase = Phase.WATCHING;
-			phaseChangeFunction.accept(phase);
+				registeredKeys.add(outputRootPath.register(watchService,
+						new WatchEvent.Kind[] { StandardWatchEventKinds.ENTRY_CREATE,
+								StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY },
+						SensitivityWatchEventModifier.HIGH));
 
-			WatchKey key;
-			while ((key = watchService.take()) != null && phase == Phase.WATCHING) {
-				processEvents(key.watchable(), key.pollEvents());
-				key.reset();
+				phase = Phase.WATCHING;
+				phaseChangeFunction.accept(phase);
+
+				WatchKey key;
+				while ((key = watchService.take()) != null && phase == Phase.WATCHING) {
+
+					if(!key.isValid()) {
+						System.out.println("Key '" + key.watchable() + "' is invalid .. rebuilding.");
+						break;
+					}
+
+					processEvents(key.watchable(), key.pollEvents());
+					key.reset();
+				}
+
+				//Cleanup registered keys
+				registeredKeys.forEach(z -> z.cancel());
+				registeredKeys.clear();
 			}
-
-			//Cleanup registered keys
-			registeredKeys.forEach(z -> z.cancel());
-			registeredKeys.clear();
 			
 			Thread.sleep(2000);
 		}
@@ -120,7 +132,7 @@ public class Watcher implements Runnable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
+			} 
 		}
 	}
 

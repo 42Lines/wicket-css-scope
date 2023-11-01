@@ -60,6 +60,7 @@ public abstract class StandardSassCompiler {
 	
 			try {
 				Output z = new Compiler().compileFile(in.toUri(), out.toUri(), options);
+				out.getParent().toFile().mkdirs();
 				Files.write(out,z.getCss().getBytes(),
 						StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 			} catch (CompilationException e) {

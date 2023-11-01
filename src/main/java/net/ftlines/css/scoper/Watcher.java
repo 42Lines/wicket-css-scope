@@ -131,6 +131,9 @@ public class Watcher implements Runnable {
 					onChange(p);
 				} catch (Exception e) {
 					e.printStackTrace();
+					System.out.println("Exception .. triggering full rebuild");
+                    phase = Phase.REBUILDING;
+                    phaseChangeFunction.accept(phase);
 				}
 			} 
 		}

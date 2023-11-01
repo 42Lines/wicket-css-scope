@@ -5,10 +5,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -52,9 +50,10 @@ public class WatchMojo extends AbstractCssScopeMojo {
 		};
 
 		try {
-			new Watcher(inputRootPath,
+			new Watcher(inputRootPath, outputRootPath,
 				Watcher.isFileEndsWithFunction(".html", ".css", ".js", ".scss"),
 				Watcher.allOf(Watcher.isFileEndsWithFunction(".scss"), Watcher.isFileNameStartsWithFunction("_")),
+				Watcher.isFileEndsWithFunction(".css"),
 				compiler::setPhase, 
 				compiler::process
 			).start();

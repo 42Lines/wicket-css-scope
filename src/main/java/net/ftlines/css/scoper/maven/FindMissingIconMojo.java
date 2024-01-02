@@ -72,7 +72,7 @@ public class FindMissingIconMojo extends AbstractMojo {
 	                if (line.contains("content")) {
 	                    String contentCode = extractContentCode(line);
 	                    if (contentCode != null && !iconCharacterCodes.contains(contentCode)) {
-	                        getLog().warn("Found violation in " + f + ": " + line.strip());
+	                        getLog().error("Found violation in " + f + ": " + line.strip());
 	                        if (failOnError) {
 	                            throw new MojoExecutionException("Icon violation found in " + f);
 	                        }
@@ -104,7 +104,7 @@ public class FindMissingIconMojo extends AbstractMojo {
 	        for (org.jsoup.nodes.Element element : elementsWithIconClass) {
 	            for(String className: element.className().split(" ")) {
 	            	if (className.startsWith("icon-") && !iconClasses.contains(className)) {
-	            		getLog().warn("Icon violation found in " + f + ": Class " + className + " is not in the allowed list.");
+	            		getLog().error("Icon violation found in " + f + ": Class " + className + " is not in the allowed list.");
 	            		if (failOnError) {
 	            			throw new MojoFailureException("Icon violation found: Class " + className + " is not in the allowed list.");
 	            		}

@@ -269,4 +269,13 @@ public class Watcher implements Runnable {
 	    return child.toAbsolutePath().startsWith(parent.toAbsolutePath());
 	}
 
+
+	public static void startAsDaemon(Path inputRoot, Path outputRootPath, Function<Path, Boolean> isWatchableFunction,
+		Function<Path, Boolean> isFullRebuildTrigger, Function<Path, Boolean> isRebuildFunction, Consumer<Phase> phaseChangeFunction, Consumer<Path> processingFunction) throws Exception {
+		Thread watcher = new Thread(new Watcher(inputRoot, outputRootPath, isWatchableFunction, isFullRebuildTrigger, 
+				isRebuildFunction, phaseChangeFunction, processingFunction));
+		watcher.setDaemon(true);
+		watcher.start();
+	}
+	
 }

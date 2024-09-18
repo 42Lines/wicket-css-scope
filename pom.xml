@@ -4,11 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.ftlines</groupId>
 	<artifactId>wicket-css-scope</artifactId>
-	<version>2.1.2-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
-	
+
 	<name>42 Lines - Wicket Css Scoping</name>
-	<description>Processes wicket panel fragments and applies scope logic to encapsulate css</description>
+	<description>Processes wicket panel fragments and applies scope logic to
+		encapsulate css</description>
 
 	<properties>
 		<java.version>11</java.version>
@@ -19,7 +20,7 @@
 		<antlr4.visitor>true</antlr4.visitor>
 		<antlr4.listener>true</antlr4.listener>
 	</properties>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
@@ -50,11 +51,17 @@
 			<artifactId>antlr4</artifactId>
 			<version>4.8-1</version>
 		</dependency>
-		
+
 		<dependency>
-    		<groupId>io.bit3</groupId>
-    		<artifactId>jsass</artifactId>
-    		<version>5.10.3</version>
+			<groupId>io.bit3</groupId>
+			<artifactId>jsass</artifactId>
+			<version>5.10.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.larsgrefer.sass</groupId>
+			<artifactId>sass-embedded-host</artifactId>
+			<version>3.6.0</version>
 		</dependency>
 
 		<dependency>
@@ -62,17 +69,17 @@
 			<artifactId>maven-plugin-api</artifactId>
 			<version>3.1.1</version>
 		</dependency>
-		
+
 		<dependency>
-    		<groupId>com.google.code.gson</groupId>
-   			<artifactId>gson</artifactId>
-    		<version>(1.7.0,)</version>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>(1.7.0,)</version>
 		</dependency>
-		
+
 		<dependency>
-    		<groupId>com.google.javascript</groupId>
-    		<artifactId>closure-compiler</artifactId>
-   			<version>v20230206</version>
+			<groupId>com.google.javascript</groupId>
+			<artifactId>closure-compiler</artifactId>
+			<version>v20230206</version>
 		</dependency>
 
 		<dependency>
@@ -93,7 +100,6 @@
 			<version>3.2</version>
 		</dependency>
 
-		
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -125,7 +131,8 @@
 				</executions>
 			</plugin>
 
-			<!-- Plugin to compile the g4 files ahead of the java files See https://github.com/antlr/antlr4/blob/master/antlr4-maven-plugin/src/site/apt/examples/simple.apt.vm 
+			<!-- Plugin to compile the g4 files ahead of the java files See
+			https://github.com/antlr/antlr4/blob/master/antlr4-maven-plugin/src/site/apt/examples/simple.apt.vm 
 				Except that the grammar does not need to contain the package declaration 
 				as stated in the documentation (I do not know why) To use this plugin, type: 
 				mvn antlr4:antlr4 In any case, Maven will invoke this plugin before the Java 
@@ -144,7 +151,8 @@
 					<grammars>css3.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
-					<outputDirectory>${project.build.directory}/generated-sources/antlr4/antlr/css3</outputDirectory>
+					<outputDirectory>
+						${project.build.directory}/generated-sources/antlr4/antlr/css3</outputDirectory>
 				</configuration>
 
 				<executions>
@@ -161,19 +169,19 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>3.6.0</version>
 			</plugin>
-			
-       <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.0.0-M4</version>
-            <dependencies>
-                <dependency>
-                    <groupId>org.junit.jupiter</groupId>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                    <version>5.3.2</version>
-                </dependency>
-            </dependencies>
-        </plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M4</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.junit.jupiter</groupId>
+						<artifactId>junit-jupiter-engine</artifactId>
+						<version>5.3.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 
 		</plugins>
 		<pluginManagement>

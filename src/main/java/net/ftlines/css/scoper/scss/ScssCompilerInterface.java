@@ -69,7 +69,6 @@ public interface ScssCompilerInterface {
 	
 	public interface ScssImporter {
 		Collection<ScssImport> apply(String url, ScssImport previous);
-		//TODO io.bit3.jsass.importer.Importer
 	}
 	
 	public static class ScssOptions {
@@ -133,11 +132,14 @@ public interface ScssCompilerInterface {
 		
 	}
 	
-	ScssOutput compileFile(URI uri, URI uri2, ScssOptions options) throws ScssCompilationException;
+	ScssOutput compileFile(URI inputPath, URI outputPath, ScssOptions options) throws ScssCompilationException;
 
-	ScssOutput compileString(String scssRaw, ScssOptions options) throws ScssCompilationException;
+	ScssOutput compileString(String scss, ScssOptions options) throws ScssCompilationException;
 	
 	public static ScssCompilerInterface create() {
-		return new JScssCompiler();
+		if(Boolean.valueOf(System.getProperty("UseLibScss", "false"))) {
+			return new JScssCompiler();	
+		}
+		return new DartScssCompiler();
 	}
 }

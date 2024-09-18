@@ -9,11 +9,16 @@ import io.bit3.jsass.Options;
 import io.bit3.jsass.Output;
 import io.bit3.jsass.importer.Import;
 import io.bit3.jsass.importer.Importer;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssOptions;
 
 public class JScssCompiler implements ScssCompilerInterface {
 
 	@Override
 	public ScssOutput compileFile(URI uri, URI uri2, ScssOptions options) throws ScssCompilationException {
+		
+		if(options == null) 
+    		options = new ScssOptions();
+		
 		try {
 			return asOutput(new io.bit3.jsass.Compiler().compileFile(uri, uri2, asOptions(options)));
 		} catch(CompilationException ce) {
@@ -23,6 +28,15 @@ public class JScssCompiler implements ScssCompilerInterface {
 
 	@Override
 	public ScssOutput compileString(String scssRaw, ScssOptions options) throws ScssCompilationException {
+		if(scssRaw == null)
+    		throw new NullPointerException();
+    	
+		if(scssRaw.isEmpty())
+			return new ScssOutput("");
+		
+    	if(options == null) 
+    		options = new ScssOptions();
+		
 		try {
 			return asOutput(new io.bit3.jsass.Compiler().compileString(scssRaw, asOptions(options)));
 		} catch(CompilationException ce) {
@@ -61,7 +75,7 @@ public class JScssCompiler implements ScssCompilerInterface {
 		opt.setSourceMapContents(options.isSourceMapContents());
 		opt.setSourceMapEmbed(options.isSourceMapEmbed());
 		opt.setOmitSourceMapUrl(options.isOmitSourceMapUrl());
-		
+
 		return opt;
 	}
 

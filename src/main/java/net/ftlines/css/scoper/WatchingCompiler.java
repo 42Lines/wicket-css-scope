@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import io.bit3.jsass.importer.Importer;
 import net.ftlines.css.scoper.AbstractScssFragmentContributor.FilePathScssImportResolver;
 import net.ftlines.css.scoper.Watcher.Phase;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssImporter;
 import net.ftlines.css.scoper.wicket.WicketSingleStyleSourceFileModifier;
 import net.ftlines.css.scoper.wicket.WicketSourceFileModifier;
 
@@ -83,7 +84,7 @@ public class WatchingCompiler {
 	private StandardSassCompiler createStandardSassCompiler(Path file) {
 		return new StandardSassCompiler(file, inputRootPath, outputRootPath) {
 			@Override
-			protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
+			protected java.util.Collection<ScssImporter> getAllScssImporters() {
 				return createImporterSetRelativeTo(file, super.getAllScssImporters());
 			}
 			
@@ -101,7 +102,7 @@ public class WatchingCompiler {
 			return new WicketSingleStyleSourceFileModifier(file, inputRootPath, outputRootPath, styles) {
 
 				@Override
-				protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
+				protected java.util.Collection<ScssImporter> getAllScssImporters() {
 					return createImporterSet(super.getAllScssImporters());
 				}
 
@@ -116,7 +117,7 @@ public class WatchingCompiler {
 		return new WicketSourceFileModifier(file, inputRootPath, outputRootPath) {
 
 			@Override
-			protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
+			protected java.util.Collection<ScssImporter> getAllScssImporters() {
 				return createImporterSet(super.getAllScssImporters());
 			}
 
@@ -128,7 +129,7 @@ public class WatchingCompiler {
 		};
 	}
 	
-	private Collection<Importer> createImporterSet(Collection<Importer> list) {
+	private Collection<ScssImporter> createImporterSet(Collection<ScssImporter> list) {
 		if(scssImportRoot != null) {
 			for(File root: scssImportRoot.get()) {
 				list.add(createImporterSet(root, list));
@@ -137,12 +138,12 @@ public class WatchingCompiler {
 		return list;
 	}
 	
-	private Collection<Importer> createImporterSetRelativeTo(Path p, Collection<Importer> list) {
+	private Collection<ScssImporter> createImporterSetRelativeTo(Path p, Collection<ScssImporter> list) {
 		list.add(createImporterSet(inputRootPath.resolve(p).toAbsolutePath().getParent().toFile(), list));
 		return list;
 	}
 	
-	private Importer createImporterSet(File root, Collection<Importer> list) {
+	private ScssImporter createImporterSet(File root, Collection<ScssImporter> list) {
 		return new FilePathScssImportResolver(root.toPath());
 	}
 	

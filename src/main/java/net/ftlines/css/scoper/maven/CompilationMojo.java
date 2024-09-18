@@ -9,10 +9,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import io.bit3.jsass.importer.Importer;
 import net.ftlines.css.scoper.AbstractScssFragmentContributor.FilePathScssImportResolver;
 import net.ftlines.css.scoper.StandardSassCompiler;
 import net.ftlines.css.scoper.StyleCollectionWriter;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssImporter;
 import net.ftlines.css.scoper.wicket.WicketSingleStyleSourceFileModifier;
 import net.ftlines.css.scoper.wicket.WicketSourceFileModifier;
 
@@ -48,8 +48,8 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 		for (String f : fileSetManager.getIncludedFiles(fileset)) {
 			new WicketSingleStyleSourceFileModifier(Path.of(f), inputRootPath, outputRootPath, styles) {			
 				@Override
-				protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
-					Collection<Importer> list = super.getAllScssImporters();
+				protected java.util.Collection<ScssImporter> getAllScssImporters() {
+					Collection<ScssImporter> list = super.getAllScssImporters();
 					if(scssImportRoot != null) {
 						for(File root: scssImportRoot) {
 							list.add(new FilePathScssImportResolver(root.toPath()));
@@ -81,8 +81,8 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 		if(StandardSassCompiler.isStandardSassFile(filePath)) {
 			new StandardSassCompiler(filePath, inputRootPath, outputRootPath) {
 				@Override
-				protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
-					Collection<Importer> list = super.getAllScssImporters();
+				protected java.util.Collection<ScssImporter> getAllScssImporters() {
+					Collection<ScssImporter> list = super.getAllScssImporters();
 					list.add(createImporterSet(inputRootPath.resolve(filePath).toAbsolutePath().getParent().toFile(), list));
 					return list;
 				}
@@ -91,8 +91,8 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 			new WicketSourceFileModifier(filePath, inputRootPath, outputRootPath) {
 
 				@Override
-				protected java.util.Collection<io.bit3.jsass.importer.Importer> getAllScssImporters() {
-					Collection<Importer> list = super.getAllScssImporters();
+				protected java.util.Collection<ScssImporter> getAllScssImporters() {
+					Collection<ScssImporter> list = super.getAllScssImporters();
 					if(scssImportRoot != null) {
 						for(File root: scssImportRoot) {
 							list.add(new FilePathScssImportResolver(root.toPath()));
@@ -105,7 +105,7 @@ public class CompilationMojo extends AbstractCssScopeMojo {
 		}
 	}
 	
-	private Importer createImporterSet(File root, Collection<Importer> list) {
+	private ScssImporter createImporterSet(File root, Collection<ScssImporter> list) {
 		return new FilePathScssImportResolver(root.toPath());
 	}
 

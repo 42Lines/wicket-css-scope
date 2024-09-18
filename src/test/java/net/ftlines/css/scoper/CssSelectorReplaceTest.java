@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import antlr.css3.css3Lexer;
 import antlr.css3.css3Parser;
-import io.bit3.jsass.Options;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssOptions;
 import net.ftlines.css.scoper.wicket.WicketExtendsMarkupContributor;
 import net.ftlines.css.scoper.wicket.WicketPanelScssContributor;
 
@@ -200,7 +200,7 @@ class CssSelectorReplaceTest {
 		
 		WicketPanelScssContributor scss = new WicketPanelScssContributor(input) {
 			@Override
-			protected void configureOptions(Options options) {
+			protected void configureOptions(ScssOptions options) {
 				super.configureOptions(options);
 				options.getImporters().add(new FilePathScssImportResolver(Paths.get("/Users/peter/git/harmonize/application/lms/src/main/java/net/ftlines/lms/components/css")));
 			}

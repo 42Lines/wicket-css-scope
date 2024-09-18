@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.bit3.jsass.CompilationException;
-import io.bit3.jsass.Compiler;
-import io.bit3.jsass.Options;
-import io.bit3.jsass.importer.Import;
-import io.bit3.jsass.importer.Importer;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssCompilationException;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssImport;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssImporter;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssOptions;
 
 public abstract class AbstractScssFragmentContributor implements CssSyleFragmentContributor {
 
@@ -27,7 +27,7 @@ public abstract class AbstractScssFragmentContributor implements CssSyleFragment
 		if (scss.isEmpty())
 			return Optional.empty();
 
-		Options options = new Options();
+		ScssOptions options = new ScssOptions();
 
 		options.setSourceMapContents(false);
 		options.setSourceMapEmbed(false);
@@ -41,21 +41,21 @@ public abstract class AbstractScssFragmentContributor implements CssSyleFragment
 			scssRaw = scssRaw.replace("@external", OBF_PREFIX + "external");
 			scssRaw = scssRaw.replace("@container", OBF_PREFIX + "container");
 			
-			String resultCss = new Compiler().compileString(scssRaw, options).getCss();
+			String resultCss = ScssCompilerInterface.create().compileString(scssRaw, options).getCss();
 			resultCss = resultCss.replace(OBF_PREFIX + "external", "@external");
 			resultCss = resultCss.replace(OBF_PREFIX + "container", "@container");
 
 			return Optional.of(resultCss);
-		} catch (CompilationException e) {
+		} catch (ScssCompilationException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected void configureOptions(Options options) {
+	protected void configureOptions(ScssOptions options) {
 
 	}
 	
-	public static class FilePathScssImportResolver implements Importer {
+	public static class FilePathScssImportResolver implements ScssImporter {
 
 		private Path root;
 
@@ -64,13 +64,13 @@ public abstract class AbstractScssFragmentContributor implements CssSyleFragment
 		}
 		
 		@Override
-		public Collection<Import> apply(String url, Import previous) {
+		public Collection<ScssImport> apply(String url, ScssImport previous) {
 			Path resolved = root.resolve(url);
 			if(Files.exists(resolved)) {
 				try {
 					URI uri = resolved.toUri();
 					String content = Files.readAllLines(resolved).stream().collect(Collectors.joining("\n"));
-					return Collections.singleton(new Import(uri, uri, content));
+					return Collections.singleton(new ScssImport(uri, uri, content));
 				} catch(Exception e) {
 					throw new RuntimeException(e);
 				}

@@ -7,12 +7,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import io.bit3.jsass.Options;
-import io.bit3.jsass.importer.Importer;
 import net.ftlines.css.scoper.AbstractSourceFileModifier;
 import net.ftlines.css.scoper.CssSyleFragmentContributor;
 import net.ftlines.css.scoper.MarkupFragmentContributor;
 import net.ftlines.css.scoper.PanelizedMarkupTransformer;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssImporter;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssOptions;
 
 public class WicketSourceFileModifier extends AbstractSourceFileModifier {
 
@@ -24,7 +24,7 @@ public class WicketSourceFileModifier extends AbstractSourceFileModifier {
 	protected List<CssSyleFragmentContributor> createCssSyleFragmentContributor(String input) {
 		return Arrays.asList(new WicketPanelScssContributor(input) {
 			@Override
-			protected void configureOptions(Options options) {
+			protected void configureOptions(ScssOptions options) {
 				super.configureOptions(options);
 				options.getImporters().addAll(getAllScssImporters());
 			}
@@ -58,7 +58,7 @@ public class WicketSourceFileModifier extends AbstractSourceFileModifier {
 		throw new RuntimeException("No transformer defined for input");
 	}
 	
-	protected Collection<Importer> getAllScssImporters() {
+	protected Collection<ScssImporter> getAllScssImporters() {
 		return new ArrayList<>();
 	}
 

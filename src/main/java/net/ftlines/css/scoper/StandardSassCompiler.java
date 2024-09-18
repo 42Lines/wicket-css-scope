@@ -7,11 +7,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import io.bit3.jsass.CompilationException;
-import io.bit3.jsass.Compiler;
-import io.bit3.jsass.Options;
-import io.bit3.jsass.Output;
-import io.bit3.jsass.importer.Importer;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssCompilationException;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssImporter;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssOptions;
+import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssOutput;
 
 public abstract class StandardSassCompiler {
 
@@ -33,8 +33,8 @@ public abstract class StandardSassCompiler {
 		return path.getFileName().toString().toLowerCase().startsWith("_");
 	}
 
-	protected Collection<Importer> getAllScssImporters() {
-		return new ArrayList<Importer>();
+	protected Collection<ScssImporter> getAllScssImporters() {
+		return new ArrayList<ScssImporter>();
 	}
 	
 	public void process() {
@@ -51,7 +51,7 @@ public abstract class StandardSassCompiler {
 			Path out = changeExtension(outputRootPath.resolve(rel), ".scss", ".css");
 
 			logString("Compiling " + out.toAbsolutePath());
-			Options options = new Options();
+			ScssOptions options = new ScssOptions();
 
 			options.setSourceMapContents(false);
 			options.setSourceMapEmbed(false);
@@ -59,11 +59,11 @@ public abstract class StandardSassCompiler {
 			options.getImporters().addAll(getAllScssImporters());
 	
 			try {
-				Output z = new Compiler().compileFile(in.toUri(), out.toUri(), options);
+				ScssOutput z = ScssCompilerInterface.create().compileFile(in.toUri(), out.toUri(), options);
 				out.getParent().toFile().mkdirs();
 				Files.write(out,z.getCss().getBytes(),
 						StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-			} catch (CompilationException e) {
+			} catch (ScssCompilationException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
 				throw new RuntimeException(e);

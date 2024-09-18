@@ -192,10 +192,7 @@ class CssSelectorReplaceTest {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		//viz("#eee { background-color: #FFF;}");
-		
-//		viz(".class-grades .form-list .label {	width:120px; }");
-		
+
 		String input = getFileContents(Paths.get("/Users/peter/git/harmonize/application/lms/src/main/java/net/ftlines/lms/pages/login/LoginPage.html"));
 		
 		WicketPanelScssContributor scss = new WicketPanelScssContributor(input) {
@@ -210,9 +207,6 @@ class CssSelectorReplaceTest {
 			MarkupFragmentContributor.combine(new WicketExtendsMarkupContributor(input)), new CssScopeMetadata(new Properties()), true);
 		
 		System.out.println(results.getScopedCss());
-		
-//		viz(new WicketPanelCssContributor(AbstractSourceFileModifier.pathAsString(Paths.get(
-//			"/Users/peter/git/harmonize/application/lms/src/main/java/net/ftlines/lms/pages/login/LoginPage.html"))).getCss().get());
 	}
 	
 	private static String getFileContents(Path p) {

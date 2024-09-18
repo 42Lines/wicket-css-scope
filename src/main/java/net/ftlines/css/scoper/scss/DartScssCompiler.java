@@ -116,6 +116,10 @@ public class DartScssCompiler implements ScssCompilerInterface {
             		url = url.replace("memory:", "");
             	}
             	
+            	if(url.startsWith("file:")) {
+            		url = url.replace("file:", "");
+            	}
+            	
                 // The method to actually resolve the import's content
                 Collection<ScssImport> scssImports = scssImporter.apply(url, null);
                 if (scssImports == null || scssImports.isEmpty()) {
@@ -136,7 +140,7 @@ public class DartScssCompiler implements ScssCompilerInterface {
                 // Return the built ImportSuccess object
                 return result.build();
             }
-        }.autoCanonicalize();
+        };
     }
 
 

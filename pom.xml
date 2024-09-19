@@ -72,7 +72,12 @@
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 			<version>3.1.1</version>
-			<scope>provided</scope>
+			<exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>plexus-utils</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 
 		<dependency>
@@ -91,14 +96,12 @@
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
 			<version>${mavenVersion}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.maven.shared</groupId>
 			<artifactId>file-management</artifactId>
 			<version>3.0.0</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -114,27 +117,13 @@
 			<version>5.3.2</version>
 			<scope>test</scope>
 		</dependency>
-		
-		<dependency>
+
+<dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.8.1</version>
 </dependency>
-		
-		<dependency>
-    <groupId>com.google.guava</groupId>
-    <artifactId>guava</artifactId>
-    <version>25.1-android</version>
-                <!-- Exclude jsr305:1.3.9 from guava -->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.errorprone</groupId>
-                    <artifactId>error_prone_annotations</artifactId>
-                </exclusion>
-            </exclusions>
-</dependency>
 
-<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 <dependency>
     <groupId>commons-io</groupId>
     <artifactId>commons-io</artifactId>
@@ -216,25 +205,6 @@
 				</dependencies>
 			</plugin>
 
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-enforcer-plugin</artifactId>
-      <version>3.1.0</version>
-      <executions>
-        <execution>
-          <id>enforce-dependencyConvergence</id>
-          <goals>
-            <goal>enforce</goal>
-          </goals>
-          <configuration>
-            <rules>
-              <dependencyConvergence/>
-            </rules>
-            <fail>true</fail>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
 
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>

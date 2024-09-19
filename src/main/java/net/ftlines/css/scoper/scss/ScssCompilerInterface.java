@@ -137,9 +137,6 @@ public interface ScssCompilerInterface {
 	ScssOutput compileString(String scss, ScssOptions options) throws ScssCompilationException;
 	
 	public static ScssCompilerInterface create() {
-		if(Boolean.valueOf(System.getProperty("UseLibScss", "false"))) {
-			return new JScssCompiler();	
-		}
 		return new DartScssCompiler();
 	}
 }

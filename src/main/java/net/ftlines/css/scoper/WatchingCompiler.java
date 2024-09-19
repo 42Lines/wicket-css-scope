@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-import io.bit3.jsass.importer.Importer;
 import net.ftlines.css.scoper.AbstractScssFragmentContributor.FilePathScssImportResolver;
 import net.ftlines.css.scoper.Watcher.Phase;
 import net.ftlines.css.scoper.scss.ScssCompilerInterface.ScssImporter;

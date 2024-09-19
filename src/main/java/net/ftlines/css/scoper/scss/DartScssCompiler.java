@@ -28,7 +28,6 @@ public class DartScssCompiler implements ScssCompilerInterface {
 
             // Convert input URI to File
             File inputFile = new File(inputFileUri);
-
             // Compile the file
             CompileSuccess compileSuccess = sassCompiler.compileFile(inputFile);
 

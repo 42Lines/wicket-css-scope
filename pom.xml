@@ -20,20 +20,19 @@
 		<antlr4.visitor>true</antlr4.visitor>
 		<antlr4.listener>true</antlr4.listener>
 	</properties>
-
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<name>42Lines Release Repository</name>
-			<url>https://repo.aws.42lines.net/repository/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>42Lines Snapshot Repository</name>
-			<url>https://repo.aws.42lines.net/repository/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-
+	
+<distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/42Lines/wicket-css-scope</url>
+    </repository>
+    <snapshotRepository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/42Lines/wicket-css-scope</url>
+    </snapshotRepository>
+  </distributionManagement>
 
 	<dependencies>
         <!-- jsoup -->

@@ -25,12 +25,12 @@
     <repository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/42Lines/wicket-css-scope</url>
+      <url>https://maven.pkg.github.com/42Lines/packages</url>
     </repository>
     <snapshotRepository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/42Lines/wicket-css-scope</url>
+      <url>https://maven.pkg.github.com/42Lines/packages</url>
     </snapshotRepository>
   </distributionManagement>
 
